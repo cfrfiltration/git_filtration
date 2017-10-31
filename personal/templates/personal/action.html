@@ -1,0 +1,17 @@
+{% extends "personal/newtab.html" %}
+{% load static %}
+{% block content %}
+
+	
+	{#{form}#}
+	{#{form.particleDiameter1}#}
+	 
+	<img src="{% static 'personal/images/test.png' %}" style="width:700px;height:500px;"/>
+	<br/><br/>
+	<a href="{% static 'personal/images/test.png' %}" target = "_blank">Open in new tab</a>
+	<script type="text/javascript">
+		
+	  
+	</script>
+
+{% endblock %}

@@ -1,0 +1,19 @@
+3/27/09: 
+1. Improved the number format and precision for Result table in 'Filter Analysis'.
+2. Solved the problem with reloading 'pressure drop graph' after changing parameters.
+
+3/28/09: 
+1. Updated the pop-up windows.
+2. Adjusted the position of legend in 'overall efficiency graph'.
+3. Solved the problem with reloading graphs or result table in 'filter analysis'.
+
+11/03/09:
+1. Added the filter pleating design module.
+
+02/22/10:
+1. Added the Frazier permeability and more flowrate units in pleating design module.
+2. Changed the x-axis of the graph for filter pressure drop from pleat count to pleat density.
+
+03/25/10:
+1. Added the panel filter pleating design for triangular pleat.
+2. Added the pleating design at high volume flowrate (triangular pleat).

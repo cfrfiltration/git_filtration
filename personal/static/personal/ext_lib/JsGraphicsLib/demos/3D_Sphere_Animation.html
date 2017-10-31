@@ -1,0 +1,46 @@
+<html>
+<head>
+	<title>3D Sphere Animations</title>
+	<script type="text/javascript" src="../lib/prototype.js"></script>
+	<script type="text/javascript" src="../lib/wz_jsgraphics.js"></script>
+	<script type="text/javascript" src="../lib/ErrorManager.js"></script>
+	<script type="text/javascript" src="../JavaScript3d.js"></script>
+	<script type="text/javascript" src="../Painter.js"></script>
+	<script type="text/javascript" src="../Point.js"></script>
+	<script type="text/javascript" src="../Sphere.js"></script>
+</head>
+<body>
+	<div id="canvas" style="margin: 10px; border: solid thin black; width: 100%; height: 100%">
+		Animated Sphere demo (<a href="javascript: void(0);" onclick="startAnimation()">Start</a>) - (<a href="javascript: void(0);" onclick="stopAnimation()">Stop</a>) - (<a href="javascript: void(0);" onclick="ErrorManager.debug = true;">Debugger On</a>) - (<a href="javascript: void(0);" onclick="ErrorManager.debug = false;">Debugger Off</a>)
+	</div>
+	<script type="text/javascript">
+		ErrorManager.debug = true;
+		var painter = new JavaScript3d.Painter('canvas');
+		var sphere = new JavaScript3d.Sphere(new JavaScript3d.Point(300, 300, 300), 200);
+		sphere.wireSize = 1;
+		painter.drawWireObjs([sphere]);
+		painter.paint();
+
+		var stopAni = true;
+		var trace = false;
+		function startAnimation() {
+			stopAni = false;
+			animate(0);
+		}
+		function animate(degree) {
+			if(stopAni == true) return;
+			painter.clear();
+			sphere.rotate(0, 0, Math.PI/180);
+			painter.drawWireObjs([sphere]);
+			painter.paint();
+			setTimeout("animate()", 20);
+		}
+		function stopAnimation() {
+			stopAni = true;
+		}
+	</script>
+	<a href="javascript:void(0)" onclick="document.getElementById('errors').innerHTML = ErrorManager.getFormatedHTMLErrors()">Error Log</a>	
+	<div id="errors">&nbsp;
+	</div>
+</body>
+</html>

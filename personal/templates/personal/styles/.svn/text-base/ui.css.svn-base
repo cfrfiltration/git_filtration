@@ -1,0 +1,41 @@
+@media screen {
+  div.constantContainer {
+    float: left;
+	width: 200px;
+	margin: 10px;
+	padding: 5px;
+	border: solid 1px black;
+  }
+  div.depositionMechanismFormulaSelectionContainer {
+    float: left;
+	width: 200px;
+	height: 100px;
+	overflow: auto;
+	margin: 10px;
+	padding: 5px;
+	border: solid 1px black;
+  }
+  table#constantsLegend {
+	padding: 2px;
+	border: solid 1px black;
+  }
+  table#constantsLegend th {
+	background-color: #e5e5e5;
+  }
+  div.formulaContainer div.formula {
+    background-color: #e5e5e5;
+	padding: 5px;
+  }
+  div.formulaContainer div.inputs {
+    padding: 5px;
+  }
+  div#actions {
+    padding: 20px;
+  }
+  table.resultTable {
+	border: solid 1px black;
+  }
+  table.resultTable td{
+	border: solid 1px black;
+  }
+}

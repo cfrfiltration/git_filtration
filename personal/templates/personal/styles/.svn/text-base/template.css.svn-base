@@ -1,0 +1,45 @@
+@media screen {
+  body {
+    background-image:url('../images/Background1.jpg');
+	margin: 0px;
+  }
+  div#globalContainer {
+    width: 100%;
+	text-align: center;
+  }
+  div#container {
+    width: 759px;
+	text-align: left;
+	border: solid 3px black;
+	background-color: white;
+  }
+  div#headerContainer {
+    width: 759px;
+	height: 95px;
+    background-image:url('../images/Banner.jpg');
+	background-repeat:no-repeat;
+	background-position:top center;
+  }
+  div#mainContainer {
+    padding-left: 15px;
+	padding-right: 15px;
+	padding-bottom: 15px;
+  }
+  div#headerContainer h1 {
+    color: black;
+  }
+  div#footerContainer {
+    text-align: center;
+  }
+  div#footerContainer div#copyright {
+    font-family: courier;
+    font-size: 12px;
+  }
+  div.footerContainer {
+    text-align: center;
+  }
+  div#rangeAndStepContainer {
+	
+  }
+  
+}

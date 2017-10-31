@@ -1,0 +1,247 @@
+<html>
+<head>
+  <title>Filtration Software</title>
+  <script type="text/javascript" src="ext_lib/JsGraphicsLib/lib/ErrorManager.js"></script>
+  <script type="text/javascript" src="ext_lib/JsGraphicsLib/lib/prototype.js"></script>
+  <script type="text/javascript" src="ext_lib/JsGraphicsLib/lib/wz_jsgraphics.js"></script>
+  <script type="text/javascript" src="ext_lib/JsGraphicsLib/SimpleLineGraph/SimpleLineGraph.js"></script>
+  <script type="text/javascript" src="ext_lib/JsGraphicsLib/SimpleLineGraph/Painter.js"></script>
+  <script type="text/javascript" src="ext_lib/JsGraphicsLib/SimpleLineGraph/Axis.js"></script>
+  <script type="text/javascript" src="ext_lib/JsGraphicsLib/SimpleLineGraph/Point.js"></script>
+  <script type="text/javascript" src="ext_lib/JsGraphicsLib/SimpleLineGraph/Legend.js"></script>
+  <script type="text/javascript" src="ext_lib/JsGraphicsLib/SimpleLineGraph/Table.js"></script>
+  <script type="text/javascript" src="ext_lib/JsGraphicsLib/SimpleLineGraph/DataSet.js"></script>
+  <script type="text/javascript" src="ext_lib/JsGraphicsLib/Layout/JsLayoutManager.js"></script>
+  <script type="text/javascript" src="ext_lib/JsGraphicsLib/Layout/XWindow.js"></script>
+  <script type="text/javascript" src="ext_lib/JsGraphicsLib/Layout/Panel.js"></script>
+  <script type="text/javascript" src="ext_lib/JsGraphicsLib/Layout/TabGroup.js"></script>
+  <script type="text/javascript" src="ext_lib/JsGraphicsLib/Layout/Tab.js"></script>
+  <script type="text/javascript" src="ext_lib/scriptaculous-js-1.8.1/src/scriptaculous.js"></script>
+  <script type="text/javascript" src="lib/FilterLayer.js"></script>
+  <script type="text/javascript" src="lib/Formula.js"></script>
+  <script type="text/javascript" src="lib/DepositionMechanism.js"></script>
+  <script type="text/javascript" src="lib/Constant.js"></script>
+  <script type="text/javascript" src="formulae.js"></script>
+  <script type="text/javascript" src="staticConfig.js"></script>
+  <script type="text/javascript" src="scripts/uiLoader.js"></script>
+  <script type="text/javascript" src="scripts/switch module.js"></script>
+  <link rel="stylesheet" type="text/css" href="styles/template.css" />
+  <link rel="stylesheet" type="text/css" href="styles/ui.css" />
+  <link rel="stylesheet" type="text/css" href="styles/layoutComponents.css" />
+  
+  <script type="text/javascript">
+// <![CDATA[	
+	var debugFlag = true;
+	function updateDebug() {
+		$('errorConsole').innerHTML = ErrorManager.getFormatedHTMLErrors();
+		if(debugFlag) looper('updateDebug()', 2000);
+	}
+	function looper(func, timeout) {
+		setTimeout(func, timeout);
+	}
+	function setDefaults() {
+		$('faceVelocityConstant').value = cfg['constants']['uf'].value;
+		$('gasViscosityConstant').value = cfg['constants']['mu'].value;
+		$('particleDensityConstant').value = cfg['constants']['df'].value;
+		$('lambdaStandardConstant').value = cfg['constants']['lambdaStandard'].value;
+		$('TemperatureConstant').value = cfg['constants']['temp'].value;
+		$('PressureConstant').value = cfg['constants']['pre'].value;
+		document.settings.tempUnits.value = 1;
+		document.settings.tempUnits.oldvalue = 1;
+		document.settings.pressureUnits.value = 1;
+		document.settings.pressureUnits.oldvalue = 1;
+		enableAgglomerateFields();
+	}
+
+	function computeLambda() {
+	cfg['constants']['lambda']= cfg['constants']['lambdaStandard'].value * cfg['constants']['temp'].value / 293 * 14.7/ cfg['constants']['pre'].value;
+	$('computedLambda').value=cfg['constants']['lambda']
+	}
+
+	function convertTemp(oldUnit, newUnit, temp) {
+		document.settings.tempUnits.oldvalue = newUnit;
+		var newTemp = 0;
+		if (oldUnit == 1) { //convert oldtemp to K
+			newTemp = temp;
+		} else if (oldUnit == 2) {
+			newTemp = parseFloat(temp)+273.15;
+		} else if (oldUnit == 3) {
+			newTemp = ((parseFloat(temp) - 32) * (5 / 9)) + 273.15
+		}
+		if (newUnit==1) { //convert newtemp to new unit
+			//alert("boo"); //nothing to see here!
+		} else if (newUnit ==2 ) {
+			newTemp = parseFloat(newTemp)-273.15;
+		} else if (newUnit == 3) {
+			newTemp = (parseFloat(newTemp) - 273.15) * (9/5) + 32;
+		}
+		//alert(oldUnit + ", " + newUnit + ", " + temp + ", " + newTemp);
+		document.settings.TemperatureConstant.value = newTemp;
+	}
+	
+	function convertPressure(oldUnit, newUnit, pressure) {
+		document.settings.pressureUnits.oldvalue = newUnit;
+		var newPressure;
+		if (oldUnit == 1) { //convert old pressure to psi
+			newPressure = pressure;
+		} else if (oldUnit == 2) {
+			newPressure = pressure * 14.6979488;
+		} else if (oldUnit == 3) {
+			newPressure = pressure / 6.89475729;
+		}
+		if (newUnit==1) { //convert newPressure to new unit
+			//do nothing
+		} else if (newUnit == 2) {
+			newPressure = newPressure / 14.6979488;
+		} else if (newUnit == 3) {
+			newPressure = newPressure * 6.89475729;
+		}
+		document.settings.PressureConstant.value = newPressure;
+	}
+	function enableAgglomerateFields() {
+		document.settings.primaryParticleDiameter.disabled = !document.settings.agglomerateChecked.checked;
+		document.settings.fractalDimension.disabled = !document.settings.agglomerateChecked.checked;
+	}
+	
+		
+// ]]>
+</script>
+  <style type="text/css">
+<!--
+.STYLE1 {font-size: 18px}
+-->
+  </style>
+</head>
+<body onLoad="loadInitialInputGUI(); setDefaults(); loadNewTabGroupUI('systemTabs')">
+<!--<body onload="setDefaults();">-->
+  <div id="globalContainer" align="center">
+    <center>
+    <div id="container">
+	  <div id="headerContainer">&nbsp;</div>
+
+	  	<div id="navcontainer">
+
+			<div id=logoLink><a href="http://www.me.umn.edu/centers/cfr/index.htm" rel="self"><img id="logo" src="images/Logo_trimmed.jpg" height="80" width="144" alt="Center for Filtration Research" /></a></div>
+		
+       			<div id=toolbarLink style="margin-left: 60px"><a href="index.html"  
+            		rel="self"  
+            		id="current"  
+            		name="current">Filter Analysis</a></div>  
+
+	        	<div id=toolbarLink><a href="dust%20loading.html"  
+            		rel="self">Dust Loading</a></div>  
+
+         		<div id=toolbarLink><a href="pleating%20design.html"  
+            		rel="self">Pleating Design</a></div>  
+
+		</div>
+
+ <form name="settings">
+	  <table id="filter_analysis">
+		<tr>
+			<td COLSPAN=2 class="column_name"> <strong>Particle Size</strong></td>
+			<td COLSPAN=2 class="column_name"> <strong>Flow Parameters</strong> </td>
+		</tr>
+		<tr>
+			<td COLSPAN=2> Range <input type="text" size="3" id="minRange" value="0.005" /> - <input type="text" size="3" id="maxRange" value="1" /> &mu;m </td>
+			<td COLSPAN=2> <label>Face Velocity</label> <input type="text" size="7" id="faceVelocityConstant" onChange="cfg['constants']['uf'].value=this.value;" value="0" /> cm/s  </td>
+		</tr>
+		<tr>
+			<td COLSPAN=2> <label>Step: <input type="text" size="4" id="step" value="0.005" /> &mu;m </label> </td>
+			<td COLSPAN=2> <label>Gas Viscosity</label> <input type="text" size="7" id="gasViscosityConstant" onChange="cfg['constants']['mu'].value=this.value;" /> g/cm*s</td>
+		</tr>
+		<tr>
+			<td><label>Temperature <input type="text" size="5" id="TemperatureConstant" onchange="setTemp(tempUnits.value, this.value);" />
+						<select name="tempUnits" onChange="convertTemp(this.oldvalue, this.value, TemperatureConstant.value);">
+	  					<option value="1">K</option>
+	  					<option value="2">C</option>
+	  					<option value="3">F</option>
+	  					</select>
+			</label></td>
+			<td><label> &nbsp; Pressure <input type="text" size="4" id="PressureConstant" onChange="setPressure(pressureUnits.value, this.value);"  /> 
+				  <select name="pressureUnits" onChange="convertPressure(this.oldvalue, this.value, PressureConstant.value);">
+	  				<option value="1">psi</option>
+	  				<option value="2">atm</option>
+	  				<option value="3">kPa</option>
+	  				</select>
+
+			</label></td>
+			<td COLSPAN=2><label>Gas Mean Free Path (STP) </label><input type="text" size="4" id="lambdaStandardConstant" onChange="cfg['constants']['lambdaStandard'].value=this.value;"  /> &mu;m</td>
+		</tr>
+			
+		<tr>
+			<td COLSPAN=2>
+				<label>Particle Density <input type="text" id="particleDensityConstant" size="3" onChange="cfg['constants']['df'].value=this.value;" /> g/cm^3</label>
+			</td>
+			<td COLSPAN=2>&nbsp;</td>
+		</tr>
+		<tr>
+			<td COLSPAN=1>Filter 1<input type="checkbox" id="system1checked" checked /><br>
+			Filter 2<input type="checkbox" id="system2checked" /><br>
+			Filter 3<input type="checkbox" id="system3checked" /></td>
+			<td COLSPAN=1 align="right">
+			<label>Layer:<input type="text" size="8" value="New Layer" id="newLayerName" /></label>&nbsp;&nbsp;<input type="button" value="Add Layer" onClick="addTab($('newLayerName').value);" />
+			</td>
+
+			<td COLSPAN=2 align="center">
+
+				<div id="linkcontainer" style="margin-left: 75px">
+					<div id=linkbarLink><a href="#xwindow" rel="self" onClick="loadGraph(checkedSystems($('system1checked').checked,$('system2checked').checked,$('system3checked').checked));" name="efficiency">Efficiency</a></div>
+					<div id=linkbarLink><a href="#xwindow" rel="self" onClick="loadFOMGraph(checkedSystems($('system1checked').checked,$('system2checked').checked,$('system3checked').checked));" name="fom">FOM Graph</a></div>
+				</div>
+			
+			</td>
+		</tr>
+		<tr>
+			<td COLSPAN=4>&nbsp;</td>
+		</tr>
+		<tr>
+			<td COLSPAN=4><strong>Agglomeration</strong><input type="checkbox" id="agglomerateChecked" onChange="enableAgglomerateFields()"/></td>
+		</tr>
+		<tr>
+			<td COLSPAN=4>Primary Particle Diameter<input type="text" size="4" id="primaryParticleDiameter" /> nm</td>
+		</tr>
+		<tr>
+			<td COLSPAN=4>Fractal Dimension<input type="text" size="4" id="fractalDimension" /></td>
+		</tr>
+		<tr>
+			<td COLSPAN=4>Effective Agglomerate Density<input type="text" size="4" id="effectiveDensity" disabled="true" /> g/cm^3</td>
+		</tr>
+	  </table>
+ </form>
+
+ <div id="systemTabs" class="tabGroup">
+	<!--id tags for these tab Panels are important...a switch on these names is used in TabGroup.js to set currentSystem-->
+ 	<div id="systemTab0" class="tabPanel"></div>
+ 	<div id="systemTab1" class="tabPanel"></div>
+ 	<div id="systemTab2" class="tabPanel"></div>
+ </div>
+      <div id="mainContainer">
+  
+  	  </div>
+  	  <a name="xwindow">
+	  <div id="windowContainer" class="XWindow"></div>
+
+    </div>
+    </a>
+	</center>
+  </div>
+
+  <br />
+  <div id="footerContainer">
+    <div id="copyright">Copyright &copy; 2012, University of Minnesota</div>
+  	<a href="../Fil_analysis_old/index.html">Previous Version</a>
+  </div>
+  <br />
+  <div id="errorConsole" align="center">
+    <a href="javascript:void(0);" onClick="debugFlag=true; updateDebug();">Start Monitor</a>
+    -
+    <a href="javascript:void(0);" onClick="debugFlag=false;">Stop Monitor</a>
+    - 
+    <a href="javascript:void(0);" onClick="$('errorConsole').innerHTML='';">Clear Monitor</a>
+    -
+    <a href="javascript:void(0);" onClick="ErrorManager.errors=new Array(); $('errorConsole').innerHTML='';">Erase Logs</a>
+  </div>
+</body>
+
+</html>

@@ -1,0 +1,83 @@
+<html>
+<head>
+  <title>Slip Correction Utilities</title>
+
+  <link rel="stylesheet" type="text/css" href="styles/template.css" />
+  <link rel="stylesheet" type="text/css" href="styles/ui.css" />
+  <link rel="stylesheet" type="text/css" href="styles/layoutComponents.css" />
+  
+  <script type="text/javascript">
+	function Cc(meanFreePath, radius) { return 1 + (meanFreePath / 2 / radius)*(2.34 + 1.05*Math.exp(-0.78*radius/meanFreePath)); }
+	function calcCc() {
+		mfp = document.settings.meanFreePath.value * 1e-9;
+		radius = document.settings.dp.value * 0.5e-6;
+		
+		//Cc = 1 + (mfp / 2 / radius)*(2.34 + 1.05*Math.exp(-0.78*radius/mfp));
+		document.settings.Cc.value = Cc(mfp,radius);
+		return Cc;
+	}
+	function DoC() {
+		lf_lastSlip = 1;
+		lf_dTest = document.settings.doc.value * 1e-6;
+		i = 0;
+		TOL = 0.0001;
+		lb_complete = false;
+		lf_doc = lf_dTest;
+		do {
+			i++;
+			lf_slipTest = Cc(document.settings.meanFreePath2.value * 1e-9, lf_dTest / 2);
+			if (Math.abs(lf_slipTest - lf_lastSlip) / lf_slipTest < TOL) {
+				lb_complete = true;
+				document.settings.solvedDp.value = lf_dTest / 1e-6;
+			} else {
+				lf_lastSlip = lf_slipTest;
+				lf_dTest = lf_doc * lf_lastSlip;
+			}
+			if (i > 1000) {
+				lb_complete = true;
+				document.settings.solvedDp.value = -1;
+			}
+		} while (!lb_complete);
+		return lf_dTest / 1e-6;
+	}
+</script>
+  <style type="text/css">
+<!--
+.STYLE1 {font-size: 18px}
+-->
+  </style>
+</head>
+<body onload="calcCc(); Doc();">
+<!--<body onload="setDefaults();">-->
+  <div id="globalContainer" align="center">
+    <center>
+    <div id="container">
+	  <div id="headerContainer">&nbsp;</div>
+
+ <form name="settings">
+	  <table width="752	">
+		<tr>
+			<td COLSPAN=3> <strong>Slip Correction</strong></td>
+		</tr>
+		
+		<tr>
+			<td>Mean Free Path <input type="text" name="meanFreePath" size="8" value="66" onkeyup="calcCc();"> nm</td>
+			<td>Diameter <input type="text" name="dp" size="8" value="1" onkeyup="calcCc();"> um</td>
+			<td>SLIP <input type="text" name="Cc" size="8" disabled="true"></td>
+		<tr>
+			<td COLSPAN=3> &nbsp;</td>
+		</tr>
+		</tr>
+		<tr>
+			<td COLSPAN=3> <strong>Diameter from d/C</strong></td>
+		</tr>
+		<tr>
+			<td>Mean Free Path <input type="text" name="meanFreePath2" size="8" value="66" onkeyup="DoC();"> nm</td>
+ 			<td>d / C <input type="text" name="doc" size="8" value="1e-3" onkeyup="DoC();"> (um) </td>
+ 			<td>Diameter <input type="text" name="solvedDp" size="8" disabled="true"> um</td>
+ </form>
+ 	</div>
+</div>
+</body>
+
+</html>

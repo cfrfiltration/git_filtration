@@ -1,0 +1,90 @@
+@media screen {
+	/** 
+	 * PANEL STYLES
+	 */
+	div.panel {
+		display: none;
+	}
+
+	div.panelHeader {
+		display: block;
+		margin: 1px;
+		background-color: #FFFFFF;
+	}
+
+	div.panelHeaderHover {
+		display: block;
+		margin: 0px;
+		border: solid 1px black;
+		background-color: #CCCCCC;
+	}
+
+	div.panelContent {
+		display: block;
+	}
+	/******************************* END PANEL STYLES ***************************/
+
+	/**
+	 * Tab/TabGroup Styles
+	 */
+	/**
+	 * The actual div tag that the contents of each tab is held in
+	 */
+	div.tabPanel {
+		display: none;	/* This is required for javascript to work!!!  Do not remove default display attributes! */
+		background-color: #e5e5e5;
+	}
+	/**
+	 * The div tag that wraps all of the tabs, tab panels, header and body
+	 */
+	div.tabGroup {
+		background-color: #CCCCCC;
+		border: solid 1px black;
+	}
+	/**
+	 * The div tag that wraps all of the tab links
+	 */
+	div.tabHeader {
+		display: block;
+		padding: 2px;
+	}
+	/**
+	 * The div tag that wraps the tabPanels
+	 */
+	div.tabBodyFocused {
+		display: block;
+	}
+	div.tabBodyBlured {
+		display: none;
+	}
+	/**
+	 * The div tag that supplies the user with a tab to click to change the active tab
+	 */
+	div.tab {
+		border: solid 1px black;
+		border-bottom: none;
+		margin-right: 2px;
+		padding: 2px;
+		display: inline;
+		background-color: #DDDDDD;
+		cursor: pointer;
+	}
+	/**
+	 * This is the style used if the tab is active (refer to 'tab')
+	 */
+	div.tabActive {
+		border: solid 1px black;
+		border-bottom: none;
+		margin-right: 2px;
+		padding: 2px;
+		display: inline;
+		background-color: #AAAAAA;
+	}
+	table.tabResult {
+		background-color: #AAAAAA;
+		margin-top: -1px;
+		top: 0;
+		padding: 0;
+	}
+	/********************************* END TAB/TABGROUP STYLES *******************************/
+}

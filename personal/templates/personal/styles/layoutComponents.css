@@ -1,0 +1,158 @@
+@media screen {
+	/** 
+	 * PANEL STYLES
+	 */
+	div.panel {
+		display: none;
+	}
+
+	div.panelHeader {
+		display: block;
+		margin: 1px;
+		background-color: #FFFFFF;
+	}
+
+	div.panelHeaderHover {
+		display: block;
+		margin: 0px;
+		border: solid 1px black;
+		background-color: #CCCCCC;
+	}
+
+	div.panelContent {
+		display: block;
+	}
+	/******************************* END PANEL STYLES ***************************/
+
+	/**
+	 * Tab/TabGroup Styles
+	 */
+	/**
+	 * The actual div tag that the contents of each tab is held in
+	 */
+	div.tabPanel {
+		display: none;	/* This is required for javascript to work!!!  Do not remove default display attributes! */
+		background-color: #e5e5e5;
+	}
+	/**
+	 * The div tag that wraps all of the tabs, tab panels, header and body
+	 */
+	div.tabGroup {
+		background-color: #CCCCCC;
+		/*border: solid 1px black;*/
+		border: ridge;
+	}
+	/**
+	 * The div tag that wraps all of the tab links
+	 */
+	div.tabHeader {
+		display: block;
+		margin-top: 5px;
+		/*background-color: #CC0000;*/
+	}
+	/**
+	 * The div tag that wraps the tabPanels
+	 */
+	div.tabBodyFocused {
+		display: block;
+	}
+	div.tabBodyBlured {
+		display: none;
+	}
+	/**
+	 * The div tag that supplies the user with a tab to click to change the active tab
+	 */
+	div.tab {
+		border: solid 1px black;
+		/*border-bottom: none;*/
+		margin-right: 2px;
+		padding: 2px;
+		display: inline;
+		background-color: #DDDDDD;
+		border: outset;
+		cursor: pointer;
+	}
+	/**
+	 * This is the style used if the tab is active (refer to 'tab')
+	 */
+	div.tabActive {
+		/*border: solid 1px black;*/
+		border: inset;
+		/*border-bottom: none;*/
+		margin-right: 2px;
+		padding: 2px;
+		display: inline;
+		background-color: #AAAAAA;
+	}
+	table.tabResult {
+		background-color: #AAAAAA;
+		margin-top: -1px;
+		top: 0;
+		padding: 0;
+	}
+	/********************************* END TAB/TABGROUP STYLES *******************************/
+	
+	
+	.tab-box { 
+  border-bottom: 1px solid #DDD;
+  padding-bottom:5px;
+}
+.tab-box a {
+  border:1px solid #DDD;
+  color:#666666;
+  padding: 5px 15px;
+  text-decoration:none;
+  background-color: #eee;
+}
+.tab-box a.activeLink { 
+  background-color: #fff; 
+  border-bottom: 0; 
+  padding: 6px 15px;
+}
+.tabcontent { border: 1px solid #ddd; border-top: 0;}
+.hide { display: none;}
+	
+	
+	div.XWindow {
+		position: absolute;
+		display: none;
+		border: solid thin black;
+		width: 759px;
+		height: 670px;
+		padding-bottom: 60px;
+		background-color: #FFFFFF;
+		filter:alpha(opacity=90);
+		-moz-opacity:1;
+		opacity:1;
+		z-index: 1;
+		overflow: scroll;
+	}
+	div.XWindowTitleBar {
+		display: block;
+		cursor: move;
+		background-color: #e5e5e5;
+		font-size: 18px;
+		font-weight: bold;
+		width: 100%;
+	}
+	td#XWindowTitleBarActions {
+		text-align: right;
+	}
+	span.XWindowTitleBarTitle {
+		font-size: 12px;
+		cursor: text;
+		color: #000000;
+	}
+	span.XWindowTitleBarActions {
+		font-size: 10px;
+		cursor: text;
+		color: #000000;
+	}
+	div.XWindowContent {
+		display: block;
+		font-size: 14px;
+		padding-left: 15px;
+		padding-right: 15px;
+		background-color: #FFFFFF;
+	}
+}

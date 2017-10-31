@@ -1,0 +1,65 @@
+<html>
+<head>
+	<title>3D Cube Animation Demo</title>
+	<script type="text/javascript" src="../lib/prototype.js"></script>
+	<script type="text/javascript" src="../lib/wz_jsgraphics.js"></script>
+	<script type="text/javascript" src="../lib/ErrorManager.js"></script>
+	<script type="text/javascript" src="../JavaScript3d.js"></script>
+	<script type="text/javascript" src="../Painter.js"></script>
+	<script type="text/javascript" src="../Point.js"></script>
+	<script type="text/javascript" src="../Cube.js"></script>
+</head>
+<body>
+	<div id="canvas" style="margin: 10px; border: solid thin black; width: 100%; height: 100%">
+	3D Cube Animation (<a href="javascript: void(0);" onclick="startAnimation()">Start</a>) - (<a href="javascript: void(0);" onclick="stopAnimation()">Stop</a>) - (<a href="javascript: void(0);" onclick="ErrorManager.debug = true;">Debugger On</a>) - (<a href="javascript: void(0);" onclick="ErrorManager.debug = false;">Debugger Off</a>)
+	</div>
+	<script type="text/javascript">
+		var painter = new JavaScript3d.Painter('canvas');
+		var cube1 = new JavaScript3d.Cube(50, 260, 260, 100, 0, 0, 0);
+			cube1.wireStroke = 2;
+			cube1.wireColor = "#0000CC";
+		var cube2 = new JavaScript3d.Cube(100, 260, 260, 100, 0, 0, 0);
+		var cube3 = new JavaScript3d.Cube(150, 260, 260, 100, 0, 0, 0);
+			cube3.wireStroke = 4;
+			cube3.wireColor = "#00CC00";
+		var cube4 = new JavaScript3d.Cube(200, 260, 260, 100, 0, 0, 0);
+			cube4.wireStroke = 5;
+			cube4.wireColor = "#00CCCC";
+		var cube5 = new JavaScript3d.Cube(250, 260, 260, 100, 0, 0, 0);
+			cube5.wireStroke = 6;
+			cube5.wireColor = "#CCCCCC";
+		painter.drawWireObjs([cube1, cube2, cube3, cube4, cube5]);
+		painter.paint();
+		
+		var stopAni = true;
+		var rad = 5*Math.PI/180;
+		function startAnimation() {
+			stopAni = false;
+			ErrorManager.logDebug("Framerate attempted: 10 fps");
+			animate();
+		}
+		function animate() {
+			var start = new Date().getTime();
+			if(stopAni == true) return;
+			cube1.rotate(0, 0, rad);
+			cube2.rotate(0, rad, 0);
+			cube3.rotate(rad, 0, 0);
+			cube4.rotate(0, rad, rad);
+			cube5.rotate(rad, rad, 0);
+			painter.clear();
+			painter.drawWireObjs([cube1, cube2, cube3, cube4, cube5]);
+			painter.paint();
+			setTimeout("animate()", 100);
+			var diffTime = 1 / ((new Date().getTime() - start) / 1000);
+			ErrorManager.logDebug("Actual Framerate: "+diffTime+" fps");
+		}
+		function stopAnimation() {
+			stopAni = true;
+			ErrorManager.logDebug("Painter Object Stopped: "+painter);
+		}
+	</script>
+	<a href="javascript:void(0)" onclick="document.getElementById('errors').innerHTML = ErrorManager.getFormatedHTMLErrors()">Error Log</a>	
+	<div id="errors">&nbsp;
+	</div>
+</body>
+</html>

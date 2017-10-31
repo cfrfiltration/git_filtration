@@ -1,0 +1,13 @@
+/**
+ * Filter Layer Object
+ */
+FilterLayer = Class.create();
+
+FilterLayer.prototype = {
+	initialize: function(title) {
+		this.title = title;
+	},
+	toString: function() {
+		return "[FilterLayer]";
+	}
+}

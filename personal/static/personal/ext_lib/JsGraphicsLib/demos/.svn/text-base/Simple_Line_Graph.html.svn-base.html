@@ -1,0 +1,78 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<title>Simple Line Graph Function</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<style type="text/css">
+	div#errorConsole {
+		margin: 10px;
+		padding: 10px;
+		border: dashed 1px red;
+	}
+	div#errorConsole div.errorMsg {
+		margin: 2px;
+		padding: 2px;
+		background-color: #ffdddd;
+	}
+	div#graphCanvas {
+		width: 600px;
+		height: 600px;
+		margin: 20px;
+		border: dashed 1px black;
+		overflow: hidden;
+	}
+</style>
+<script type="text/javascript" src="../lib/ErrorManager.js"></script>
+<script type="text/javascript" src="../lib/prototype.js"></script>
+<script type="text/javascript" src="../lib/wz_jsgraphics.js"></script>
+<script type="text/javascript" src="../SimpleLineGraph/SimpleLineGraph.js"></script>
+<script type="text/javascript" src="../SimpleLineGraph/Painter.js"></script>
+<script type="text/javascript" src="../SimpleLineGraph/Axis.js"></script>
+<script type="text/javascript" src="../SimpleLineGraph/Point.js"></script>
+<script type="text/javascript" src="../SimpleLineGraph/Legend.js"></script>
+<script type="text/javascript" src="../SimpleLineGraph/Table.js"></script>
+<script type="text/javascript" src="../SimpleLineGraph/DataSet.js"></script>
+<script type="text/javascript">
+	ErrorManager.debug = true;
+	var SLG = new SimpleLineGraph("Simple Line Graph Demo");
+	function drawGraph() {
+		var f = $('inputFunction').value;
+		var min = $('minRange').value;
+		var max = $('maxRange').value;
+		var step = $('step').value;
+		
+		var ds = SLG.static_createDataSet(f, min, max, step);
+		ds.color = "#cc0000";
+		ds.size = 2;
+		SLG.addDataSet(ds);
+		
+		SLG.draw('graphCanvas', 300, 300, 100, 100);
+	}
+	function clearGraph() {
+		SLG.clear();
+	}
+	
+	function updateDebug() {
+		$('errorConsole').innerHTML = ErrorManager.getFormatedHTMLErrors();
+		looper('updateDebug()', 1000);
+	}
+	function looper(func, timeout) {
+		setTimeout(func, timeout);
+	}
+</script>
+</head>
+<body onload="updateDebug()">
+<div id="inputFunctionContainer">
+	Function (use '$x' as variable): <input type="text" size="30" name="inputFunction" id="inputFunction" />
+	Range: <input type="text" size="4" id="minRange" />-<input type="text" size="4" id="maxRange" />
+	Step: <input type="text" size="4" id="step" />
+	<br />
+	<input type="button" value="Draw Graph" onclick="drawGraph();" />
+	<input type="button" value="Clear Graph" onclick="clearGraph();" />
+</div>
+<div id="graphCanvas">
+</div>
+<div id="errorConsole">
+</div>
+</body>
+</html>

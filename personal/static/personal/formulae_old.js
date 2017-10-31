@@ -1,0 +1,101 @@
+glbl_eq1_helper = null;
+glbl_eq2_helper = null;
+glbl_eq3_helper = null;
+glbl_eq4_helper = null;
+glbl_eq5_helper = null;
+glbl_eq6_helper = null;
+function defineHelpers(particleSize, c) {
+	// helper formulae
+	glbl_eq1_helper = particleSize / c['fs'].value;
+	glbl_eq2_helper = 1+(2*c['lambda'].value/particleSize)*(1.165 + 0.483 * Math.exp(-0.997/(2 * c['lambda'].value / particleSize)));
+	glbl_eq3_helper = c['df'].value * Math.pow(particleSize * 0.0001,2) * glbl_eq2_helper * c['uf'].value/ (18 * c['mu'].value * c['fs'].value * 0.0001);
+	if (glbl_eq1_helper < c['r'].value) 
+			glbl_eq4_helper = (c['j1'].value-c['j2'].value*Math.pow(c['alpha'].value,c['j3'].value))* Math.pow(glbl_eq1_helper,2) - c['j4'].value * Math.pow(glbl_eq1_helper, c['j5'].value);
+	else 	glbl_eq4_helper = 2;
+
+	glbl_eq5_helper = glbl_eq2_helper * 1.38 * Math.pow(10,-16) * 293 / (3 * 3.14 * c['mu'].value * particleSize * 0.0001);
+	glbl_eq6_helper = c['fs'].value * 0.0001 * c['uf'].value/glbl_eq5_helper;
+}
+/**
+ * Each formula must behave identical to this function
+ * @param particleSize A numeric value representing the particleSize variable in the formula
+ * @param constantsArray An array of constants as defined in the staticConfig that are used in the formula
+ * @return numeric
+ */
+var interception_exampleFormula1 = new Formula("Equation One",
+	function(particleSize, c) 
+	{
+		defineHelpers(particleSize, c);
+		interceptionEqOne = Math.abs(c['interception'].value-0)*(1+glbl_eq1_helper)/c['ku'].value*(2*Math.log(1+glbl_eq1_helper)-1+Math.pow((1/(1+glbl_eq1_helper)),2));
+		return interceptionEqOne;
+	}
+);
+var interception_exampleFormula2 = new Formula("Equation Two",
+	function(particleSize, c) 
+	{
+		defineHelpers(particleSize, c);	
+		result = ( (1/(1 + glbl_eq1_helper)) - (1 + glbl_eq1_helper) + 2*(1 + 1.996 *c['kn'].value)*(1+glbl_eq1_helper) * Math.log(1+glbl_eq1_helper) ) / (2*(-0.75-0.5*Math.log(c['alpha'].value)) + 1.996*c['kn'].value*(-0.5 - Math.log(c['alpha'].value)));
+		return result;
+	}
+);
+
+
+var impaction_exampleFormula1 = new Formula("Equation One",
+	function(particleSize, c) 
+	{		
+		defineHelpers(particleSize, c);
+		impactionEqOne = glbl_eq3_helper * glbl_eq4_helper/(2*Math.pow(c['ku'].value,2));
+		return impactionEqOne;
+	}
+);
+
+var impaction_formula2 = new Formula("Equation Two",
+	function(particleSize, c) {
+		defineHelpers(particleSize, c);
+		result =  Math.pow(glbl_eq3_helper,3) / (Math.pow(glbl_eq3_helper,3) + 0.77 * Math.pow(glbl_eq3_helper,2) + 0.22);
+		return result;
+	}
+);
+
+var diffusion_exampleFormula1 = new Formula("Equation One",
+	function(particleSize, c) 
+	{		
+		defineHelpers(particleSize, c);
+		diffusionEqOne = Math.abs(c['diffuAst'].value-0)*2*Math.pow(glbl_eq6_helper,(-2/3));
+		return diffusionEqOne;
+	}
+);
+
+var diffusion_formula2 = new Formula ("Equation Two",
+	function(particleSize, c) {
+		defineHelpers(particleSize, c);
+		return (2.27 * Math.pow(c['ku'].value, -1/3) * Math.pow(glbl_eq6_helper, -2/3)) * (1+0.62*c['kn'].value * Math.pow(glbl_eq6_helper, 1/3) * Math.pow(c['ku'].value, -1/3));
+	}
+);
+
+var interDiffInter_exampleFormula1 = new Formula("Equation One",
+	function(particleSize, c) 
+	{
+		defineHelpers(particleSize, c);
+		if (glbl_eq6_helper>100)
+				drEqOne = 1.24*Math.pow(glbl_eq1_helper,(2/3))/Math.pow((c['ku'].value*glbl_eq6_helper),0.5);
+		else	drEqOne = 0;
+		
+		return drEqOne;
+	}
+);
+
+
+/**
+ * SPECIA Equations
+ */
+var pressureDrop_equationOne = new Formula("Equation One",
+	function(particleSize, c) {
+		return 1000000 * ( (c['T'].value *  4 * c['mu'].value * c['alpha'].value * c['uf'].value) * (1+1.996*c['kn'].value) / ((0.25 *  Math.pow(c['fs'].value, 2)) * ( -0.5 * Math.log(c['alpha'].value) - 0.75 + c['alpha'].value - (Math.pow(c['alpha'].value, 2) / 4 ) + 1.996 * c['kn'].value * (-0.5 * Math.log(c['alpha'].value) - 0.25 + (Math.pow(c['alpha'].value, 2) / 4)))) ) ;
+	}
+);
+var pressureDrop_equationTwo = new Formula("Equation Two",
+	function(particleSize, c) {
+		return 1000000 * ((c['mu'].value * c['uf'].value * c['T'].value * (64 * Math.pow(c['alpha'].value,1.5) * (1 + 56 * Math.pow(c['alpha'].value,3)))) / Math.pow(c['fs'].value, 2) );
+	}
+);

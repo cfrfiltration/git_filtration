@@ -1,0 +1,81 @@
+<html>
+<head>
+	<title>3D Point Animations</title>
+	<script type="text/javascript" src="../lib/prototype.js"></script>
+	<script type="text/javascript" src="../lib/wz_jsgraphics.js"></script>
+	<script type="text/javascript" src="../lib/ErrorManager.js"></script>
+	<script type="text/javascript" src="../JavaScript3d.js"></script>
+	<script type="text/javascript" src="../Painter.js"></script>
+	<script type="text/javascript" src="../Point.js"></script>
+</head>
+<body>
+	<div id="canvas" style="margin: 10px; border: solid thin black; width: 100%; height: 100%">
+		Animated Point demo (<a href="javascript: void(0);" onclick="trace()">Trace</a>) - (<a href="javascript: void(0);" onclick="painter.clear()">Clear</a>) - (<a href="javascript: void(0);" onclick="ErrorManager.debug = true;">Debugger On</a>) - (<a href="javascript: void(0);" onclick="ErrorManager.debug = false;">Debugger Off</a>)  <br />
+		Set Angle of Rotation:<br/>
+		<input type="text" id="aorx" value="0" size="3" />
+		<input type="text" id="aory" value="0" size="3" />
+		<input type="text" id="aorz" value="0" size="3" />
+		<input type="button" name="setaor" value="Set" size="3"
+			onclick="rotate($('aorx').value, $('aory').value, $('aorz').value)" /><br />
+		Current Rotation Transform Matrix<br />
+		<input type="text" id="rtx" value="" size="10" />
+		<input type="text" id="rty" value="" size="10" />
+		<input type="text" id="rtz" value="" size="10" /><br />
+		Current Point position<br />
+		red <input type="text" id="p1" value="" size="10" />
+		gre <input type="text" id="p2" value="" size="10" />
+		blu <input type="text" id="p3" value="" size="10" />
+	</div>
+	<script type="text/javascript">
+		var painter = new JavaScript3d.Painter('canvas');
+		var axis = new JavaScript3d.Point(300, 300, 300);
+		    axis.size = "50";
+		var planet1 = new JavaScript3d.Point(50, 300, 300);
+		    planet1.color = "#FF3333";
+		var planet2 = new JavaScript3d.Point(550, 300, 300);
+		    planet2.size = "5"; planet2.color = "#33FF33"; 
+		var planet3 = new JavaScript3d.Point(300, 550, 300);
+		    planet3.size = "10"; planet3.color = "#3333FF";
+		painter.drawWireObjs([axis, planet1, planet2, planet3]);
+			ErrorManager.logDebug("Objects Drawn, now Painting");
+		painter.paint();
+
+		var stopAni = true;
+		var oneDegree = Math.PI/180;
+		var rt = new Object();
+		rt.zwire = new JavaScript3d.Point(0, 0, 1);
+		rt.ywire = new JavaScript3d.Point(0, 1, 0);
+		rt.xwire = new JavaScript3d.Point(1, 0, 0);
+		var scalarAxis = new JavaScript3d.Point(0,0,0);
+		function trace() {
+			for(i = 0; i < 367; i++) {
+				planet1.rotate(axis, rt.zwire.x * oneDegree, rt.zwire.y * oneDegree, rt.zwire.z * oneDegree);
+				planet2.rotate(axis, rt.ywire.x * oneDegree, rt.ywire.y * oneDegree, rt.ywire.z * oneDegree);
+				planet3.rotate(axis, rt.xwire.x * oneDegree, rt.xwire.y * oneDegree, rt.xwire.z * oneDegree);
+				painter.drawWireObjs([planet1, planet2, planet3, axis]);
+			}
+				painter.paint();
+		}
+		function rotate(ax, ay, az) {
+			ax = ax * Math.PI / 180; ay = ay * Math.PI / 180; az = az * Math.PI / 180;
+			planet1.rotate(axis, ax, ay, az);
+			planet2.rotate(axis, ax, ay, az);
+			planet3.rotate(axis, ax, ay, az);
+			painter.drawWireObjs([axis, planet1, planet2, planet3]);
+			painter.paint();
+			rt.zwire.rotate(scalarAxis, ax, ay, az);
+			rt.ywire.rotate(scalarAxis, ax, ay, az);
+			rt.xwire.rotate(scalarAxis, ax, ay, az);
+			$('rtx').value = rt.xwire.toString();
+			$('rty').value = rt.ywire.toString();
+			$('rtz').value = rt.zwire.toString();
+			$('p1').value = planet1.toString();
+			$('p2').value = planet2.toString();
+			$('p3').value = planet3.toString();
+		}
+	</script>
+	<a href="javascript:void(0)" onclick="document.getElementById('errors').innerHTML = ErrorManager.getFormatedHTMLErrors()">Error Log</a>	
+	<div id="errors">&nbsp;
+	</div>
+</body>
+</html>

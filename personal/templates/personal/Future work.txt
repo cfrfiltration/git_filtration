@@ -1,0 +1,9 @@
+1. Value check, and set Default values in "Filter analysis"
+
+2. Export the results as spreadsheet file
+
+3. Compare different results in the same graph
+
+4. Incompatibility of graphs in I.E.
+
+5. Adjust the size and appearance of the graph layer

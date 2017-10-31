@@ -1,0 +1,205 @@
+<html>
+<head>
+  <title>Filtration Software</title>
+  <script type="text/javascript" src="ext_lib/JsGraphicsLib/lib/ErrorManager.js"></script>
+  <script type="text/javascript" src="ext_lib/JsGraphicsLib/lib/prototype.js"></script>
+  <script type="text/javascript" src="ext_lib/JsGraphicsLib/lib/wz_jsgraphics.js"></script>
+  <script type="text/javascript" src="ext_lib/JsGraphicsLib/SimpleLineGraph/SimpleLineGraph.js"></script>
+  <script type="text/javascript" src="ext_lib/JsGraphicsLib/SimpleLineGraph/Painter.js"></script>
+  <script type="text/javascript" src="ext_lib/JsGraphicsLib/SimpleLineGraph/Axis.js"></script>
+  <script type="text/javascript" src="ext_lib/JsGraphicsLib/SimpleLineGraph/Point.js"></script>
+  <script type="text/javascript" src="ext_lib/JsGraphicsLib/SimpleLineGraph/Legend.js"></script>
+  <script type="text/javascript" src="ext_lib/JsGraphicsLib/SimpleLineGraph/Table.js"></script>
+  <script type="text/javascript" src="ext_lib/JsGraphicsLib/SimpleLineGraph/DataSet.js"></script>
+  <script type="text/javascript" src="ext_lib/JsGraphicsLib/Layout/JsLayoutManager.js"></script>
+  <script type="text/javascript" src="ext_lib/JsGraphicsLib/Layout/XWindow.js"></script>
+  <script type="text/javascript" src="ext_lib/JsGraphicsLib/Layout/Panel.js"></script>
+  <script type="text/javascript" src="ext_lib/JsGraphicsLib/Layout/TabGroup.js"></script>
+  <script type="text/javascript" src="ext_lib/JsGraphicsLib/Layout/Tab.js"></script>
+  <script type="text/javascript" src="ext_lib/scriptaculous-js-1.8.1/src/scriptaculous.js"></script>
+  <script type="text/javascript" src="lib/FilterLayer.js"></script>
+  <script type="text/javascript" src="lib/Formula.js"></script>
+  <script type="text/javascript" src="lib/DepositionMechanism.js"></script>
+  <script type="text/javascript" src="lib/Constant.js"></script>
+  <script type="text/javascript" src="formulae.js"></script>
+  <script type="text/javascript" src="staticConfig.js"></script>
+  <script type="text/javascript" src="scripts/uiLoader.js"></script>
+  <script type="text/javascript" src="scripts/switch module.js"></script>
+  <link rel="stylesheet" type="text/css" href="styles/template.css" />
+  <link rel="stylesheet" type="text/css" href="styles/ui.css" />
+  <link rel="stylesheet" type="text/css" href="styles/layoutComponents.css" />
+  
+  <script type="text/javascript">
+// <![CDATA[	
+	var debugFlag = true;
+	function updateDebug() {
+		$('errorConsole').innerHTML = ErrorManager.getFormatedHTMLErrors();
+		if(debugFlag) looper('updateDebug()', 2000);
+	}
+	function looper(func, timeout) {
+		setTimeout(func, timeout);
+	}
+	function setDefaults() {
+		$('faceVelocityConstant').value = cfg['constants']['uf'].value;
+	}
+
+	function computeLambda() {
+	cfg['constants']['lambda']= cfg['constants']['lambdaStandard'].value * cfg['constants']['temp'].value / 293 * 14.7/ cfg['constants']['pre'].value;
+	$('computedLambda').value=cfg['constants']['lambda']
+	}
+
+
+		
+// ]]>
+</script>
+  <style type="text/css">
+<!--
+.STYLE1 {font-size: 18px}
+-->
+  </style>
+</head>
+<body onLoad="loadInitialInputGUI(); setDefaults(); loadNewTabGroupUI('systemTabs')">
+<!--<body onload="setDefaults();">-->
+  <div id="globalContainer" align="center">
+    <center>
+    <div id="container">
+	  <div id="headerContainer">&nbsp;</div>
+
+	  	<div id="navcontainer">
+
+			<div id=logoLink><a href="http://www.me.umn.edu/centers/cfr/index.htm" rel="self"><img id="logo" src="images/Logo_trimmed.jpg" height="80" width="144" alt="Center for Filtration Research" /></a></div>
+		
+       			<div id=toolbarLink style="margin-left: 30px"><a href="index.html"  
+            		rel="self"  
+ >Filter Analysis</a></div>  
+
+	        	<div id=toolbarLink><a href="dust%20loading.html"  
+            		rel="self">Dust Loading</a></div>  
+
+         		<div id=toolbarLink><a href="pleating%20design.html"  
+            		rel="self">Pleating Design</a></div>  
+            	<div id=toolbarLink><a href="global_loading.html"
+            		rel="self"
+            		           		id="current"  
+            		name="current">Global</a></div>
+
+		</div>
+
+ <form name="settings">
+	  <table id="filter_analysis">
+		<tr>
+			<td COLSPAN=1 class="global_column_name"> <strong>Filters to Compare</strong></td>
+			<td COLSPAN=1 class="global_column_name"> <strong>Location</strong> </td>
+			<td COLSPAN=1 class="global_column_right_name"> <strong>Flow Parameters</strong> </td>
+		</tr>
+		<tr>
+			<td COLSPAN=1>Filter 1<input type="checkbox" id="system1checked" checked /><br>
+				Filter 2<input type="checkbox" id="system2checked" /><br>
+				Filter 3<input type="checkbox" id="system3checked" />
+			</td>
+			<td COLSPAN=1> <select name="location">
+								<option value="1">Minneapolis</option> 
+								<option value="2">Denver</option>
+								<option value="3">Manhattan</option>
+								<option value="4">Los Angeles</option>
+							</select>
+			</td>	
+			<td COLSPAN=1> <label>Face Velocity</label> <input type="text" size="7" id="faceVelocityConstant" onChange="cfg['constants']['uf'].value=this.value;" value="0" /> cm/s  </td>
+		</tr>
+		<tr >
+			<td COLSPAN=3><u2><strong><br>Tri-modal loading</strong></u2></td>
+		</tr>
+		<tr bgcolor="#e5e5e5">
+			<td COLSPAN=1> <strong>Aerosol 1</strong></td>
+			<td COLSPAN=1> <strong>Aerosol 2</strong></td>
+			<td COLSPAN=1> <strong>Aerosol 3</strong></td>
+		</tr>
+		<tr bgcolor="#e5e5e5">
+			<td>% concentration:<input type="text" id="numPercent" name="numPercent" size="3" value="33"></td>
+			<td>% concentration:<input type="text" id="numPercent2" name="numPercent2" size="3" value="33"></td>
+			<td>% concentration:<input type="text" id="numPercent2" name="numPercent3" size="3" value="34"></td>
+		</tr>
+		<tr bgcolor="#e5e5e5">
+			<td COLSPAN=1>Geo Mean Diameter<input type="text" name="geoMeanDiameter" size="3" value="1"> &mu;m</td>
+			<td COLSPAN=1>Geo Mean Diameter<input type="text" name="geoMeanDiameter2" size="3" value="1"> &mu;m</td>
+			<td COLSPAN=1>Geo Mean Diameter<input type="text" name="geoMeanDiameter3" size="3" value="1"> &mu;m</td>
+		</tr>
+
+		<tr bgcolor="#e5e5e5">
+			<td COLSPAN=1>GSD<input type="text" name="geoStdDeviation" size="3" value="1.5"></td>
+			<td COLSPAN=1>GSD<input type="text" name="geoStdDeviation2" size="3" value="1.5"></td>
+			<td COLSPAN=1>GSD<input type="text" name="geoStdDeviation3" size="3" value="1.5"></td>
+		<tr bgcolor="#e5e5e5">
+			<td COLSPAN=1>Particle density<input type="text" name="particleDensity" size="3" value="1"> g/cm^3</td>
+			<td COLSPAN=1>Particle density<input type="text" name="particleDensity2" size="3" value="1"> g/cm^3</td>
+			<td COLSPAN=1>Particle density<input type="text" name="particleDensity3" size="3" value="1"> g/cm^3</td>
+		</tr>
+		<tr bgcolor="#e5e5e5">
+			<td COLSPAN=1>Dynamic shape factor<input type="text" name="shapeFactor" size="3" value="1.2"></td>
+			<td COLSPAN=1>Dynamic shape factor<input type="text" name="shapeFactor2" size="3" value="1.2"></td>
+			<td COLSPAN=1>Dynamic shape factor<input type="text" name="shapeFactor3" size="3" value="1.2"></td>
+		</tr>
+
+		<tr>
+			<td COLSPAN=1><strong><br>Data Source</strong></td>
+			<td><strong><br>Pressure Drop Plot</strong></td>
+			<td></td>
+		<tr>
+			<td COLSPAN=1> <select name="dataSource">
+								<option value="1">Location</option> 
+								<option value="2">Trimodal</option>
+								<option value="3">Data File</option>
+							</select>
+			</td>	
+			<td COLSPAN=1> <select name="pressureDropPlot">
+								<option value="1">Time</option> 
+								<option value="2">Loaded Mass</option>
+							</select>
+			</td>	
+			<td>
+
+				<div id="linkcontainer" style="margin-left: 100px">
+					<div id=linkbarLink><a href="javascript:void(0);" rel="self" onClick="PopupSample();" name="efficiency">Pressure Drop</a></div>
+				</div>
+			
+			</td>
+		</tr>
+
+	  </table>
+ </form>
+
+ <div id="systemTabs" class="tabGroup">
+	<!--id tags for these tab Panels are important...a switch on these names is used in TabGroup.js to set currentSystem-->
+ 	<div id="systemTab0" class="tabPanel"></div>
+ 	<div id="systemTab1" class="tabPanel"></div>
+ 	<div id="systemTab2" class="tabPanel"></div>
+ </div>
+      <div id="mainContainer">
+  
+  	  </div>
+  	  <a name="xwindow">
+	  <div id="windowContainer" class="XWindow"></div>
+
+    </div>
+    </a>
+	</center>
+  </div>
+
+  <br />
+  <div id="footerContainer">
+    <div id="copyright">Copyright &copy; 2012, University of Minnesota</div>
+  	<a href="../Fil_analysis_old/index.html">Previous Version</a>
+  </div>
+  <br />
+  <div id="errorConsole" align="center">
+    <a href="javascript:void(0);" onClick="debugFlag=true; updateDebug();">Start Monitor</a>
+    -
+    <a href="javascript:void(0);" onClick="debugFlag=false;">Stop Monitor</a>
+    - 
+    <a href="javascript:void(0);" onClick="$('errorConsole').innerHTML='';">Clear Monitor</a>
+    -
+    <a href="javascript:void(0);" onClick="ErrorManager.errors=new Array(); $('errorConsole').innerHTML='';">Erase Logs</a>
+  </div>
+</body>
+
+</html>

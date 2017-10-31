@@ -1,0 +1,147 @@
+<html>
+<head>
+<title>Tab Group Demo</title>
+<script language="JavaScript" type="text/javascript" src="../lib/ErrorManager.js"></script>
+<script language="JavaScript" type="text/javascript" src="../lib/prototype.js"></script>
+<script language="JavaScript" type="text/javascript" src="../Layout/JsLayoutManager.js"></script>
+<script language="JavaScript" type="text/javascript" src="../Layout/Panel.js"></script>
+<script language="JavaScript" type="text/javascript" src="../Layout/TabGroup.js"></script>
+<script language="JavaScript" type="text/javascript" src="../Layout/Tab.js"></script>
+<style type="text/css">
+/** 
+ * PANEL STYLES
+ */
+div.panel {
+	display: none;
+}
+
+div.panelHeader {
+	display: block;
+	margin: 1px;
+	background-color: #FFFFFF;
+}
+
+div.panelHeaderHover {
+	display: block;
+	margin: 0px;
+	border: solid 1px black;
+	background-color: #CCCCCC;
+}
+
+div.panelContent {
+	display: block;
+}
+/******************************* END PANEL STYLES ***************************/
+
+/**
+ * Tab/TabGroup Styles
+ */
+/**
+ * The actual div tag that the contents of each tab is held in
+ */
+div.tabPanel {
+	display: none;	/* This is required for javascript to work!!!  Do not remove default display attributes! */
+	background-color: #e5e5e5;
+}
+/**
+ * The div tag that wraps all of the tabs, tab panels, header and body
+ */
+div.tabGroup {
+	background-color: #CCCCCC;
+	border: solid 1px black;
+}
+/**
+ * The div tag that wraps all of the tab links
+ */
+div.tabHeader {
+	display: block;
+	padding: 2px;
+}
+/**
+ * The div tag that wraps the tabPanels
+ */
+div.tabBodyFocused {
+	display: block;
+}
+div.tabBodyBlured {
+	display: none;
+}
+/**
+ * The div tag that supplies the user with a tab to click to change the active tab
+ */
+div.tab {
+	border: solid 1px black;
+	border-bottom: none;
+	margin-right: 2px;
+	padding: 2px;
+	display: inline;
+	background-color: #DDDDDD;
+	cursor: pointer;
+}
+/**
+ * This is the style used if the tab is active (refer to 'tab')
+ */
+div.tabActive {
+	border: solid 1px black;
+	border-bottom: none;
+	margin-right: 2px;
+	padding: 2px;
+	display: inline;
+	background-color: #AAAAAA;
+}
+table.tabResult {
+	background-color: #AAAAAA;
+	margin-top: -1px;
+	top: 0;
+	padding: 0;
+}
+/********************************* END TAB/TABGROUP STYLES *******************************/
+</style>
+</head>
+<body>
+<div id="panel" class="panel" style="display: block;">
+	<div id="container" class="tabGroup">
+		<div id="tabOne" class="tabPanel">
+			<h1> This is the contents of tab One #1</h1>
+			You could probably put some usefull stuff here if you wanted!
+		</div>
+		<div id="tabTwo" class="tabPanel">
+			<h1> This is the contents of tab TWO #2</h1>
+			<h3>You could probably put some usefull stuff here if you wanted!</h3>
+			But that is cool if you don't want to!!!
+		</div>
+		<div id="tabThree" class="tabPanel">
+			<h1> This is the contents of tab Three #3</h1>
+			<h3>You could probably put some usefull stuff here if you wanted!</h3>
+			<h4>But that is cool if you don't want to!!!</h4>
+			<h5>WOW MAN!!!!!!</h5>
+		</div>
+	</div>
+</div>
+<script language="JavaScript" type="text/javascript">
+<!--
+	// Create panels and tabs
+	panelContainer = new JsLayoutManager.Panel("Tab Container", 'panel');
+	tabOne = new JsLayoutManager.TabGroup.Tab("Tabby One", 'tabOne');
+	tabTwo = new JsLayoutManager.TabGroup.Tab("Tabby Two", 'tabTwo');
+	tabThree = new JsLayoutManager.TabGroup.Tab("Tabby Three", 'tabThree');
+	
+	// Create Tab Group
+	tabGroup = new JsLayoutManager.TabGroup('Group One', 'container');
+	tabGroup.addTab(tabOne);
+	tabGroup.addTab(tabTwo);
+	tabGroup.addTab(tabThree);
+	tabGroup.draw();
+	
+	// tab groups and panels are automatically registered with the LayoutManager class, make sure this class is included before you use
+	// tabs or panels!!!
+// -->
+</script>
+
+<div id="errorManager">
+	<h3>Debugger</h3>
+	<a href="#" onclick="document.getElementById('errors').innerHTML=ErrorManager.getFormatedHTMLErrors();">Refresh Error Log</a><br />
+	<div id="errors">&nbsp;</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,34 @@
+/**
+ * TABLE
+ * @author Martin Dale Lyness <martin.lyness@gmail.com>
+ */
+SimpleLineGraph.Table = Class.create();
+
+SimpleLineGraph.Table.prototype = {
+	initialize: function() {
+		this.dataSets = new Array();
+	},
+	addSet: function(ds) {
+		this.dataSets.push(ds);
+	},
+	draw: function(divId, offX, offY) {
+		html = "<div style=\"position:absolute; max-width: 600px; overflow: auto; top: "+(offY + 70)+"px; left: "+offX+"px;\"\"><table class=\"resultTable\"><tr><th>&nbsp;</th>";
+		
+		var tmp = new Array();
+		for(i=this.dataSets[0].points.length-1; i>=0; i--) {
+			tmp.push("<th>"+this.dataSets[0].points[i].x+"</th>");
+		}	
+		html += tmp.reverse().join("")+"</tr>";
+		
+		for(i=this.dataSets.length-1; i>=0; i--) {
+			html += "<tr><td>"+this.dataSets[i].title+"</td>";
+			tmp = new Array();
+			for(j=this.dataSets[i].points.length-1; j>=0; j--)
+				tmp.push("<td>"+this.dataSets[i].points[j].y+"</td>");
+			html += tmp.reverse().join("")+"</tr>";
+		}
+		html += "</table></div>";
+		
+		$(divId).innerHTML += html;
+	}
+}

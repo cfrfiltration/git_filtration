@@ -1,0 +1,68 @@
+<html>
+<head>
+	<title>3D Point Animations</title>
+	<script type="text/javascript" src="../lib/prototype.js"></script>
+	<script type="text/javascript" src="../lib/wz_jsgraphics.js"></script>
+	<script type="text/javascript" src="../lib/ErrorManager.js"></script>
+	<script type="text/javascript" src="../JavaScript3d.js"></script>
+	<script type="text/javascript" src="../Painter.js"></script>
+	<script type="text/javascript" src="../Point.js"></script>
+</head>
+<body>
+	<div id="canvas" style="margin: 10px; border: solid thin black; width: 100%; height: 100%">
+		Animated Point demo (<a href="javascript: void(0);" onclick="startAnimation()">Start</a>) - (<a href="javascript: void(0);" onclick="stopAnimation()">Stop</a>) - (<a href="javascript: void(0);" onclick="startTracing()">Start Tracing</a>) - <a href="javascript: void(0);" onclick="stopTracing()">Stop Tracing</a>)
+	</div>
+	<script type="text/javascript">
+		var painter = new JavaScript3d.Painter('canvas');
+		var farCorner = new JavaScript3d.Point(screen.width, screen.height, 0);
+		var axis = new JavaScript3d.Point(300, 300, 0);
+		    axis.size = "50";
+		var planet1 = new JavaScript3d.Point(50, 300, 0);
+		    planet1.color = "#FF3333";
+		var planet2 = new JavaScript3d.Point(550, 300, 0);
+			planet2.rotate(axis, Math.PI/2, Math.PI/2, Math.PI/6);
+		    planet2.size = "5"; planet2.color = "#666666"; 
+		var planet3 = new JavaScript3d.Point(550, 300, 0);
+			planet3.rotate(axis, 0, 0, Math.PI/4);
+		    planet3.size = "10"; planet3.color = "#333333";
+		var planet4 = new JavaScript3d.Point(125, 325, 0);
+		    planet4.size = "15"; planet4.color = "#33FF33";     
+		var planet5 = new JavaScript3d.Point(415, 125, 0);
+		    planet5.color = "#3333FF";
+		painter.drawWireObjs([farCorner, axis, planet1, planet2, planet3, planet4, planet5]);
+			ErrorManager.logDebug("Objects Drawn, now Painting");
+		painter.paint();
+
+		var stopAni = true;
+		var trace = false;
+		var oneDegree = Math.PI/180;
+		function startAnimation() {
+			stopAni = false;
+			animate(0);
+		}
+		function animate(degree) {
+			if(stopAni == true) return;
+			if(degree == undefined || degree > 1) { 
+				degree = 0;
+			} else { degree++; }
+			if(trace == false) { painter.clear(); }
+			planet1.rotate(axis, 0, 0, oneDegree);
+			planet2.rotate(axis, oneDegree, oneDegree, oneDegree);
+			planet3.rotate(axis, oneDegree, oneDegree, oneDegree);
+			/*planet4.rotate(axis, Math.PI/10*180, Math.PI/180, 0);
+			planet5.rotate(axis, Math.PI/180, Math.PI/180, 0);*/
+			painter.drawWireObjs([planet1, planet2, planet3, planet4, planet5, axis]);
+			painter.paint();
+			setTimeout("animate("+degree+")", 20);
+		}
+		function startTracing() { trace = true; }
+		function stopTracing() { trace = false; }
+		function stopAnimation() {
+			stopAni = true;
+		}
+	</script>
+	<a href="javascript:void(0)" onclick="document.getElementById('errors').innerHTML = ErrorManager.getFormatedHTMLErrors()">Error Log</a>	
+	<div id="errors">&nbsp;
+	</div>
+</body>
+</html>

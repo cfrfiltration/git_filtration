@@ -1,0 +1,9 @@
+AuthType Basic
+AuthUserFile /data/me/centers/cfr/Fil_analysis/.htauth/htpasswd
+AuthGroupFile /data/me/centers/cfr/Fil_analysis/.htauth/htgroup
+AuthName private
+<Limit GET POST>
+require group private
+order allow,deny
+allow from all
+</Limit>

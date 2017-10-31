@@ -1,0 +1,10 @@
+1) Fixed spelling of "Efficiency" on main page
+ask://2) Eliminated Maximize and Minimize buttons from graph screens, which weren't active anyway.
+Modified layoutComponents:
+	added 		width: 759px;
+		padding-bottom: 60px;
+
+	to the Xwindow div to fix the window dimensions.
+
+Got rid of min/max buttons on Xwindows that were doing nothing anyway.
+

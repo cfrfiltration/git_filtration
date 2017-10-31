@@ -1,0 +1,218 @@
+<?xml version="1.0"?>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:svg="http://www.w3.org/2000/svg">
+<head>
+  <title>Filtration Software</title>
+  <script type="text/javascript" src="scripts/graphLoader_dust.js"></script>
+  <script type="text/javascript" src="scripts/switch module.js"></script>
+  <script type="text/javascript" src="scripts/packingData.js"></script>
+  <script type="text/javascript" src="lib/Formula_dust.js"></script>
+  <script type="text/javascript" src="ext_lib/JsGraphicsLib/lib/ErrorManager.js"></script>
+  <script type="text/javascript" src="ext_lib/JsGraphicsLib/lib/prototype.js"></script>
+  <script type="text/javascript" src="ext_lib/JsGraphicsLib/lib/wz_jsgraphics.js"></script>
+  <script type="text/javascript" src="ext_lib/JsGraphicsLib/SimpleLineGraph/SimpleLineGraph.js"></script>
+  <script type="text/javascript" src="ext_lib/JsGraphicsLib/SimpleLineGraph/Painter.js"></script>
+  <script type="text/javascript" src="ext_lib/JsGraphicsLib/SimpleLineGraph/Axis_dust.js"></script>
+  <script type="text/javascript" src="ext_lib/JsGraphicsLib/SimpleLineGraph/Point.js"></script>
+  <script type="text/javascript" src="ext_lib/JsGraphicsLib/SimpleLineGraph/Legend.js"></script>
+  <script type="text/javascript" src="ext_lib/JsGraphicsLib/SimpleLineGraph/Table.js"></script>
+  <script type="text/javascript" src="ext_lib/JsGraphicsLib/SimpleLineGraph/DataSet_dust.js"></script>
+  <script type="text/javascript" src="ext_lib/JsGraphicsLib/Layout/JsLayoutManager.js"></script>
+  <script type="text/javascript" src="ext_lib/JsGraphicsLib/Layout/XWindow.js"></script>
+  <script type="text/javascript" src="ext_lib/JsGraphicsLib/Layout/Panel.js"></script>
+  <script type="text/javascript" src="ext_lib/JsGraphicsLib/Layout/TabGroup.js"></script>
+  <script type="text/javascript" src="ext_lib/JsGraphicsLib/Layout/Tab.js"></script>
+  <script type="text/javascript" src="ext_lib/scriptaculous-js-1.8.1/src/scriptaculous.js"></script>
+  <link rel="stylesheet" type="text/css" href="styles/template.css" />
+  <link rel="stylesheet" type="text/css" href="styles/ui.css" />
+  <link rel="stylesheet" type="text/css" href="styles/layoutComponents.css" />
+  
+  <script type="text/javascript">
+// <![CDATA[	
+	var debugFlag = true;
+	var spacing = 0.1;
+	var canvasWidth = 0;
+	var canvasHeight = 0;
+	var graphTop = 27;
+	var graphLeft = 45;
+	var graphRight = 690;
+	var graphBottom = 453;
+	var graphWidth = 710;
+	var graphHeight = 488;
+	var xPos = 0;
+	var yPos = 0;
+	var packing = new Image();
+	packing.src = "packingPlot.png";
+
+	var canvas = null;
+
+	function getGraphWidth() { return graphWidth; }
+	function getGraphHeight() { return graphHeight; }
+	function updateDebug() {
+		$('errorConsole').innerHTML = ErrorManager.getFormatedHTMLErrors();
+		if(debugFlag) looper('updateDebug()', 2000);
+	}
+	function IsInputTypeSupported(typeName) {
+    	// Create element
+    	var input = document.createElement("input");
+    	// attempt to set the specified type
+    	input.setAttribute("type", typeName);
+    	// If the "type" property equals "text"
+    	// then that input type is not supported
+    	// by the browser
+    	var val = (input.type !== "text");
+    	// Delete "input" variable to
+    	// clear up its resources
+    	delete input;
+    	// Return the detected value
+    	return val;
+	}
+	function includeSlider() {
+		if (IsInputTypeSupported("range")) {
+			$('slider').innerHTML = "<input type='range' name='slider' id='slidePercent' min='0' max='100' value='0' onChange=\"$('numPercent2').value=this.value; $('numPercent').value=100-this.value;\">";
+		}
+	}
+	function looper(func, timeout) {
+		setTimeout(func, timeout);
+	}
+	function setDefaults() {
+		document.form1.gasViscosity.value = 0.000181;
+		document.form1.faceVelocity.value = 10;
+		document.form1.pressure.value = 101325;
+		document.form1.temp.value = 293.15;
+		document.form2.geoMeanDiameter.value = 1;
+		document.form2.particleDensity.value = 1;
+		document.form2.numPercent.value = 100;
+		document.form2.geoMeanDiameter2.value = 1;
+		document.form2.particleDensity2.value = 1;
+		document.form2.numPercent2.value = 0;
+		setPorosity();
+	}
+	function setPorosity() {
+			density = document.form2.particleDensity.value * 1000;
+			radius = document.form2.geoMeanDiameter.value * 1e-6/ 2;
+			temp = document.form1.temp.value;
+			mu = document.form1.gasViscosity.value / 10;
+			pressure = document.form1.pressure.value;
+			faceVelocity = document.form1.faceVelocity.value / 100;
+			knd = logDiffKnudsen(density,radius,temp,mu,pressure);
+			xf = logThermalEnergyRatio(density,radius,faceVelocity,temp);
+			if (xf > 3) {
+				porosity = 0.8464;
+			} else {
+				porosity = 1 - getPackingData(knd,xf);
+			}
+			document.form1.cakePorosity.value = porosity;
+			dot(xf,knd);
+			document.form1.coords.value = "(" + Math.floor(xf*10)/10 + "," + Math.floor(knd*10)/10 + ")";
+	}
+
+	function init(){
+		$('packingCanvas').innerHTML = "<canvas id='packingPlot' width=" + graphWidth + " height=" + graphHeight + "><p> Your browser does not support the canvas element needed.</p></canvas>";
+		canvasWidth = graphWidth;
+		canvasHeight = graphHeight;
+		canvas = document.getElementById('packingPlot').getContext('2d');
+		drawImage();
+	}
+
+	function dot(xf,knd){
+		drawImage();
+		x = xCoord(xf);
+		y = yCoord(knd);
+		canvas.beginPath();
+		canvas.beginPath();
+		canvas.arc(x-2,y-2,4,0,2*Math.PI,true);
+		canvas.fillStyle="#000";
+		canvas.fill();
+	}
+	function drawImage()
+	{
+		canvas.clearRect(0,0,canvasWidth,canvasHeight);
+		canvas.fillStyle = "#FFAA33"; //orange fill
+		canvas.drawImage(packing, xPos, yPos);
+	}
+		
+</script>
+<style type="text/css"></style>
+</head>
+
+<body onLoad="init(); setDefaults(); includeSlider();">
+  <div id="globalContainer" align="center">
+    <center>
+    <div id="container">
+	  <div id="headerContainer">&nbsp;</div>
+
+	  	<div id="navcontainer">
+
+			<div id=logoLink><a href="http://www.me.umn.edu/centers/cfr/index.htm" rel="self"><img id="logo" src="images/Logo_trimmed.jpg" height="80" width="144" alt="Center for Filtration Research" /></a></div>
+		
+       			<div id=toolbarLink style="margin-left: 60px"><a href="index.html"  
+            		rel="self"  
+            		>Filter Analysis</a></div>  
+
+	        	<div id=toolbarLink><a href="dust%20loading.html"  
+            		rel="self">Dust Loading</a></div>  
+
+         		<div id=toolbarLink><a href="pleating%20design.html"  
+            		rel="self">Pleating Design</a></div>  
+
+		</div>
+	  <form name="form1">
+	  <table width="752">
+		<tr>
+			<td COLSPAN=2> <strong>General Parameters</strong></td>
+		</tr>
+		
+		<tr>
+			<td>Gas viscosity <input type="text" name="gasViscosity" size="8" onkeyup="setPorosity();"> g/cm*s</td>
+			<td><a href="#xwindow" rel="self" onClick="loadPorosityFaceVelGraph();" name="porosityVFaceVel">Face velocity</a><input type="text" name="faceVelocity" size="3" onkeyup="setPorosity();"> cm/s</td>
+		</tr>
+		<tr>
+			<td><a href="#xwindow" rel="self" onClick="loadPorosityPressureGraph();" name="porosityVPressure">Atmospheric pressure</a><input type="text" name="pressure" size="8" onkeyup="setPorosity();"> Pa</td>
+			<td>Temperature <input type="text" name="temp" size="6" onkeyup="setPorosity();"> K</td>
+		</tr>
+		<tr>
+			<td>Dust cake porosity <input type="text" name="cakePorosity" disabled="true" size="5"></td>
+			<td>Log(Xf,KnD)=<input type="text" name="coords" disabled="true" size="10"></td>
+		</tr>
+	  </table>
+	  </form>
+	  <form name="form2">
+	
+	  <table width="752">
+		<tr>
+			<td COLSPAN=2> <strong>Aerosol 1</strong></td>
+			<td COLSPAN=2> <strong>Aerosol 2</strong></td>
+		</tr>
+		<tr>
+			<td>% of number concentration:<input type="text" id="numPercent" name="numPercent" size="3" value="50" onChange="$('numPercent2').value=100-this.value"></td>
+			<td><div id="slider"></div></td>
+			<td COLSPAN=2><input type="text" id="numPercent2" name="numPercent2" size="3" value="50" onChange="$('numPercent').value=100-this.value">% of number concentration:</td>
+		</tr>
+		<tr>
+			<td COLSPAN=2>Geometric mean of volume equivalent <a href="#xwindow" rel="self" onClick="loadPorosityDiameterGraph();" name="porosityVDia">diameter</a><input type="text" name="geoMeanDiameter" size="3" value="1" onkeyup="setPorosity();"> &mu;m</td>
+			<td COLSPAN=2>Geometric mean of volume equivalent diameter <input type="text" name="geoMeanDiameter2" size="3" value="1"> &mu;m</td>
+		</tr>
+
+			<td COLSPAN=2>Particle density <input type="text" name="particleDensity" size="3" value="1" onkeyup="setPorosity();"> g/cm^3</td>
+			<td COLSPAN=2>Particle density <input type="text" name="particleDensity2" size="3" value="1"> g/cm^3</td>
+		</tr>
+	  </table>
+
+		<div id="packingCanvas"></div>
+
+	  </form>
+	  <a name="xwindow">
+      <div id="windowContainer" class="XWindow"></div>
+      </a>
+    </div>
+	</center>
+  </div>
+
+  <br />
+  <div id="footerContainer">
+    <div id="copyright">Copyright &copy; 2013, University of Minnesota</div>
+  </div>
+  <br />
+</body>
+
+</html>

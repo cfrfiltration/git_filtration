@@ -1,0 +1,234 @@
+<html>
+<head>
+  <title>Filtration Software</title>
+  <script type="text/javascript" src="scripts/graphLoader_pleat.js"></script>
+  <script type="text/javascript" src="scripts/switch module.js"></script>
+  <script type="text/javascript" src="lib/Formula_pleat.js"></script>
+  <script type="text/javascript" src="ext_lib/JsGraphicsLib/lib/ErrorManager.js"></script>
+  <script type="text/javascript" src="ext_lib/JsGraphicsLib/lib/prototype.js"></script>
+  <script type="text/javascript" src="ext_lib/JsGraphicsLib/lib/wz_jsgraphics.js"></script>
+  <script type="text/javascript" src="ext_lib/JsGraphicsLib/SimpleLineGraph/SimpleLineGraph.js"></script>
+  <script type="text/javascript" src="ext_lib/JsGraphicsLib/SimpleLineGraph/Painter.js"></script>
+  <script type="text/javascript" src="ext_lib/JsGraphicsLib/SimpleLineGraph/Axis_pleat.js"></script>
+  <script type="text/javascript" src="ext_lib/JsGraphicsLib/SimpleLineGraph/Point.js"></script>
+  <script type="text/javascript" src="ext_lib/JsGraphicsLib/SimpleLineGraph/Legend.js"></script>
+  <script type="text/javascript" src="ext_lib/JsGraphicsLib/SimpleLineGraph/Table.js"></script>
+  <script type="text/javascript" src="ext_lib/JsGraphicsLib/SimpleLineGraph/DataSet_dust.js"></script>
+  <script type="text/javascript" src="ext_lib/JsGraphicsLib/Layout/JsLayoutManager.js"></script>
+  <script type="text/javascript" src="ext_lib/JsGraphicsLib/Layout/XWindow.js"></script>
+  <script type="text/javascript" src="ext_lib/JsGraphicsLib/Layout/Panel.js"></script>
+  <script type="text/javascript" src="ext_lib/JsGraphicsLib/Layout/TabGroup.js"></script>
+  <script type="text/javascript" src="ext_lib/JsGraphicsLib/Layout/Tab.js"></script>
+  <script type="text/javascript" src="ext_lib/scriptaculous-js-1.8.1/src/scriptaculous.js"></script>
+  <link rel="stylesheet" type="text/css" href="styles/template.css" />
+  <link rel="stylesheet" type="text/css" href="styles/ui.css" />
+  <link rel="stylesheet" type="text/css" href="styles/layoutComponents.css" />
+  
+  <script type="text/javascript">
+// <![CDATA[	
+	var debugFlag = true;
+	function updateDebug() {
+		$('errorConsole').innerHTML = ErrorManager.getFormatedHTMLErrors();
+		if(debugFlag) looper('updateDebug()', 2000);
+	}
+	function looper(func, timeout) {
+		setTimeout(func, timeout);
+	}
+	function setDefaults() {
+		document.form1.permeability.value = 6.095E-9;
+		document.form1.permea_frazier.value = 2.181;
+		document.form1.thickness.value = 0.038;
+		document.form2.pleatHeight.value = 2.2225;
+		document.form2.panelLength.value = 250;
+		document.form2.panelWidth.value = 2.54;
+		document.form2.flowRate.value = 1935.48;
+		document.form2.pleatDen_LL.value = 10;
+		document.form2.pleatDen_UL.value = 50;
+		document.form2.highFlow.checked = false;
+		document.form2.c1.value = 0.0246;
+		document.form2.c2.value = 3.35E-4;
+		document.form2.m1_k.value = 7.82E-6;
+		document.form2.m1_p.value = 2;
+		document.form2.m2_k.value = 8.96E-10;
+		document.form2.m2_p.value = 3.28;
+		document.form2.c1.disabled = true;
+		document.form2.c2.disabled = true;
+		document.form2.m1_k.disabled = true;
+		document.form2.m1_p.disabled = true;
+		document.form2.m2_k.disabled = true;
+		document.form2.m2_p.disabled = true;
+	}
+	
+// ]]>
+</script>
+
+  <style type="text/css">
+<!--
+.STYLE2 {font-size: 18px}
+-->
+  </style>
+</head>
+
+<body onLoad="setDefaults();">
+  <div id="globalContainer" align="center">
+    <center>
+    <div id="container">
+	  <div id="headerContainer">&nbsp;</div>
+	  <h1><img src="images/Logo.jpg" align="absmiddle" height="100" width="190" alt="Center for Filtration Research" />Filtration    Software <span class="STYLE2">(Pleating design)</span> </h1>
+	  <form name="form1">
+	  <div align="right">
+	  <select name="module">
+	  <option value="1">Filter Analysis</option>
+	  <option value="2">Dust Loading</option>
+	  <option value="3">Filter Pleating</option>
+	  </select>&nbsp;&nbsp;
+	  <input type="button" value="Go to" Onclick="switchModule()">&nbsp;
+	  </div><br>
+	  <table width="752">
+		<tr>
+			<td> <strong>Filter Medium Selection</strong></td>
+		</tr>
+		
+		<tr>
+			<td>
+			<select name="filterMedium" onChange="selectFilter()">
+	        <option value="1">Lydall Inc Grade 373</option>
+	        <option value="2">Lydall Inc Grade 252</option>
+			<option value="3">Lydall Inc Grade 252-A</option>
+			<option value="4">Lydall Inc Grade 213</option>
+			<option value="5">Lydall Inc Grade 255</option>
+			<option value="6">Lydall Inc Grade 1514</option>
+			<option value="7">Lydall Inc Grade 258-A</option>
+			<option value="8">Lydall Inc Grade 233</option>
+			<option value="9">Lydall Inc Grade 221</option>
+			<option value="10">Lydall Inc Grade 220</option>
+			<option value="11">Lydall Inc Grade 224</option>
+			<option value="12">Lydall Inc Grade 235</option>
+			<option value="13">Lydall Inc Grade 229</option>
+			<option value="14">Lydall Inc Grade 229-A</option>
+			<option value="15">Lydall Inc Grade 272</option>
+			<option value="16">Lydall Inc Grade 232-A</option>
+			<option value="17">Lydall Inc Grade 251</option>
+			<option value="18">Lydall Inc Grade 254</option>
+			<option value="19">Gelman Type A/E</option>
+			<option value="20">Whatman GF/A</option>
+			<option value="21">Whatman GF/B</option>
+			<option value="22">Whatman 934 AH</option>
+			<option value="23">Whatman QM-A Quartz</option>
+	        </select>
+			</td>
+		</tr>
+		
+		<tr>
+			<td>
+				Permeability <input type="text" name="permeability" size="6" value="6.095E-9" onChange="updateFrazier()"> cm^2
+				&nbsp;&nbsp;&nbsp;&nbsp;
+				Thickness <input type="text" name="thickness" size="4" value="0.038" onChange="updateFrazier()"> cm
+				&nbsp;&nbsp;&nbsp;&nbsp;
+				= <input type="text" name="permea_frazier" size="4" value="2.181" readonly="true"> Frazier
+			</td>
+		</tr>
+	  </table>
+	  </form><br>
+	  
+	  <form name="form2">
+	  <table width="752">
+		<tr>
+			<td COLSPAN=2>
+				<strong>Pleating Parameters</strong>&nbsp;
+				<select name="pleatShape">
+				<option value="1">rectangular pleat</option>
+				<option value="2">triangular pleat</option>
+				</select>
+			</td>
+		</tr>
+
+		<tr>
+			<td>Pleat height <input type="text" name="pleatHeight" size="4" value="2.2225"> cm</td>
+			<td>Panel length <input type="text" name="panelLength" size="4" value="250"> cm</td>
+		</tr>
+		
+		<tr>
+		    <td>Panel width <input type="text" name="panelWidth" size="4" value="2.54"> cm</td>
+			<td>
+				Flow rate <input type="text" name="flowRate" size="4" value="1935.48">&nbsp;
+				<select name="flowrateUnit">
+				<option value="1">lpm</option>
+				<option value="2">cfm</option>
+				<option value="3">m3/h</option>
+				</select>
+			</td>
+		</tr>
+		
+		<tr>
+			<td>
+				Pleat density <input type="text" name="pleatDen_LL" size="4" value="10"> to&nbsp;
+				<input type="text" name="pleatDen_UL" size="4" value="50"> #/100 mm
+			</td>
+		</tr>
+		
+		<tr><td COLSPAN=2>&nbsp;</td></tr>
+		
+		<tr>
+			<td COLSPAN=2>
+				<input type="checkbox" name="highFlow" onClick="checkHighFlow()"> High volume flowrate mode (triangular pleat)
+			</td>
+		</tr>
+		
+		<tr>
+			<td COLSPAN=2>Medium pressure drop non-Darcy effect</td>
+		</tr>
+		
+		<tr>
+			<td COLSPAN=2>
+				c1 <input type="text" name="c1" size="4" value="0.0246">&nbsp;&nbsp;
+				c2 <input type="text" name="c2" size="4" value="3.35E-4">&nbsp;&nbsp;
+				<a href="Pop-up Window/help_pleat_coeff.html"><img src="images/question_icon.gif" border="0" align="absmiddle"></a>	
+			</td>
+		</tr>
+		
+		<tr>
+			<td COLSPAN=2>Channel flow turbulence effect</td>
+		</tr>
+		
+		<tr>
+			<td COLSPAN=2>
+				m1_k <input type="text" name="m1_k" size="4" value="7.82E-6">&nbsp;&nbsp;
+				m1_p <input type="text" name="m1_p" size="2" value="2">&nbsp;&nbsp;&nbsp;&nbsp;
+				m2_k <input type="text" name="m2_k" size="5" value="8.96E-10">&nbsp;&nbsp;
+				m2_p <input type="text" name="m2_p" size="2" value="3.28">&nbsp;&nbsp;
+				<a href="Pop-up Window/help_pleat_coeff.html"><img src="images/question_icon.gif" border="0" align="absmiddle"></a>
+			</td>
+		</tr>
+	  </table>
+	  </form>
+	  
+	  <div style="text-align:right;">
+		<a href="javascript:void(0);" onClick="loadGraph();">Load Pressure Drop Graph</a>&nbsp;&nbsp;
+		<a href="Pop-up Window/Pleating Theories.html">References</a>&nbsp;&nbsp;
+	  </div>
+	  <br>
+	  
+      <div id="windowContainer" class="XWindow"></div>
+	  
+    </div>
+	</center>
+  </div>
+
+  <br />
+  <div id="footerContainer">
+    <div id="copyright">Copyright &copy; 2010, University of Minnesota</div>
+  </div>
+  <br />
+  <div id="errorConsole" align="center">
+    <a href="javascript:void(0);" onClick="debugFlag=true; updateDebug();">Start Monitor</a>
+    -
+    <a href="javascript:void(0);" onClick="debugFlag=false;">Stop Monitor</a>
+    - 
+    <a href="javascript:void(0);" onClick="$('errorConsole').innerHTML='';">Clear Monitor</a>
+    -
+    <a href="javascript:void(0);" onClick="ErrorManager.errors=new Array(); $('errorConsole').innerHTML='';">Erase Logs</a>
+  </div>
+</body>
+
+</html>

@@ -1,0 +1,385 @@
+/**
+ * The User Interface Loader Functions
+ */
+ 
+var glbl_eff = new Array(); // do NOT modify this variable
+var glbl_pressureDrop = new Array(); 
+var glbl_fmerit = new Array(); // do not Modify this variable.
+var glbl_GraphDisplay = 0; //global variable identifying whether any graph is being displayed.
+
+// Removes a FilterLayer based on the input ID
+function removeTab(layerId) {
+	var newArr = new Array();
+	for(i=cfg['layers'].length-1; i >= 0; i--) {
+		if(i!=layerId)
+			newArr.push(cfg['layers'][i]);
+	}
+	cfg['layers'] = new Array();
+	
+	newArr.reverse();
+	
+	cfg['layers'] = newArr;
+	glbl_eff = new Array();
+	glbl_pressureDrop = new Array();
+	glbl_fmerit = new Array();
+	loadInputGUI('mainContainer');
+}
+
+function addTab(layerName) {
+	if(layerName == "") {
+		alert("Cannot add a layer without a name!");
+		return;
+	}
+	
+	for(i=cfg['layers'].length-1; i>=0; i--) {
+		if(cfg['layers'][i].title == layerName) {
+			alert("Cannot add duplicate layer names!");
+			return;
+		}
+	}
+		
+	cfg['layers'].push(new FilterLayer($('newLayerName').value)); 
+	loadInputGUI();
+}
+
+// Requres JsLayoutManager.Tab with a dynamic parameter 'html' which will contain the contents of that tab in HTML.
+function loadTabGroupUI(tabs, canvasId) {
+	
+	groupId = "tabGroup"+Math.floor(Math.random()*100001);
+	tabGroup = new JsLayoutManager.TabGroup('Filter Layers', groupId);
+	
+	var out = "<div id=\""+groupId+"\" class=\"tabGroup\">\n";
+	
+	// traverse the slow way to maintain order without reverse operation on array
+	for(i = tabs.length-1; i>=0; i--) {
+		out += "\t<div id=\"tab"+i+"_"+groupId+"\" class=\"tabPanel\">\n";
+		out += "\t\t"+tabs[i].html+"\n";
+		out += "<p><a href=\"javascript:void(0);\" onclick=\"loadLayerResultTable("+tabs[i].tabId+", '"+canvasId+"', true)\">Load Result Table</a></p>";
+		out += "\t</div>\n";
+		tabs[i].tabId = "tab"+i+"_"+groupId;
+		tabGroup.addTab(tabs[i]);
+	}
+	out += "</div>\n";
+	
+	$(canvasId).innerHTML += out;
+	  
+	tabGroup.draw();
+	
+}
+// Defines input ids as 'constant_$symbol_layer_$layerId'
+function generateConstantInputForm(layerId) {
+        var greek=new Array();
+        greek['T']="&tau;";
+        greek['alpha']="&alpha;";
+        greek['fs']="fs";
+	var out = "<div class=\"constantContainer\">\n";
+	out += "\t<strong>Filter Parameters</strong><br />\n";
+	out += "<table>\n";
+	for(i in cfg['constants']) {
+		tmp = cfg['constants'][i];
+		if(tmp instanceof DepositionMechanism.Constant) {
+			if(!tmp.f_mutable) continue;
+			out += "\t<tr><td>"+greek[i]+"</td>"
+					+"<td><input type=\"text\" id=\"constant_"+tmp.symbol+"_layer_"+layerId+"\" size=\"3\" value=\""+tmp.value+"\" /></td><td>"+tmp.units+"</td></tr>\n";
+		}
+	}
+	out += "</table>\n";
+	out += generateConstantsLegend();
+	out += "</div>\n";
+	
+	return out;
+}
+
+
+//Open a pop-up window showing deposition mechanism equations
+function PopupWindow() {
+        window.open("Pop-up Window/Pop-up.html","_blank","width=820,height=600,top=0,left=0,scrollbars");
+}
+
+
+// Requires a DepositionMechanism Object loaded with formulae
+// radio buttons named via 'dmForumula_$layerId_$dmId' with value $formulaId
+function generateDepositionMechanismFormulaSelection(dm, dmId, layerId) {
+	var out = "<div class=\"depositionMechanismFormulaSelectionContainer\">\n";
+	out += "\t<strong>"+dm.title+"</strong><br />\n";
+	for(i=dm.formulae.length-1; i>=0; i--) {
+              if(i==0)
+		out += "\t<label><input type=\"radio\" value=\""+i+"\" name=\"dm"+dmId+"\" checked />"+dm.formulae[i].title+"&nbsp;<input type=\"button\" value=\"Show\" Onclick=\"PopupWindow()\" /></label><br />\n";
+              else
+                out += "\t<label><input type=\"radio\" value=\""+i+"\" name=\"dm"+dmId+"\" />"+dm.formulae[i].title+"</label><br />\n";
+	}
+	
+	out += "</div>\n";
+	
+	return out;
+}
+
+// Generates a legend for all of the constants defined in the staticConfig.js
+function generateConstantsLegend() {
+        var greek=new Array();
+        greek['T']="&tau;";
+        greek['alpha']="&alpha;";
+        greek['fs']="fs";
+	var out = "<table id=\"constantsLegend\">\n"
+			+"\t<tr><th colspan=\"2\">Legend</th></tr>\n";
+	
+	for(i in cfg['constants']) {
+		tmp = cfg['constants'][i];
+		if(tmp instanceof DepositionMechanism.Constant) {
+			if(!tmp.f_mutable) continue;
+			out += "\t<tr><th>"+greek[i]+"</th><td>"+tmp.description+"</td></tr>\n";
+		}
+	}
+	out += "</table>\n";
+	
+	return out;
+}
+
+function loadInputGUI() {
+	var clearHtml = "<div style=\"clear:both;\">&nbsp;</div>";
+	var tabs = new Array();
+	
+
+	for(i123=cfg['layers'].length-1; i123>=0; i123--) {
+		tabs.push(new JsLayoutManager.TabGroup.Tab(cfg['layers'][i123].title, i123));
+		html = "<form name=\"layer"+i123+"\"><table><tr>";
+		html += "<td style=\"vertical-align:top\">"+generateConstantInputForm(i123)+"</td><td style=\"vertical-align:top\">";
+		for(j=cfg['depositionMechanisms'].length-1; j>=0; j--) {
+			html += generateDepositionMechanismFormulaSelection(cfg['depositionMechanisms'][j], j, i123);
+		}
+		html += generateDepositionMechanismFormulaSelection(cfg['pressure'], "pressure", i123);
+		html += "</td></tr></table></form>";
+		removeLink = "<div style=\"text-align: right\"><a href=\"javascript:void(0);\" onclick=\"removeTab("+i123+")\">remove layer (X)</a></div>";
+		html = removeLink + clearHtml + html + clearHtml;
+		tabs[tabs.length-1].html = html;
+		//ErrorManager.logDebug("Adding Tab("+i+"): " + tabs[tabs.length-1].tabName);
+	}
+	// Add Pressure Selection Box
+
+
+	$("mainContainer").innerHTML = "<br />";
+
+	// alert(tabs.length)
+	loadTabGroupUI(tabs, "mainContainer");
+}
+
+function loadLayerResultTable(layerId, canvasId, display) {
+	if(!validateLayerInputs(layerId))
+		return;
+
+	// load constants into array
+	for(i in cfg['constants']) {
+		if(cfg['constants'][i] instanceof DepositionMechanism.Constant) {
+			if(cfg['constants'][i].f_mutable)
+				cfg['constants'][i].value = parseFloat($('constant_'+i+'_layer_'+layerId).value);
+		}
+	}
+
+
+	// Load Deposition Mechanisms
+	for(i=cfg['depositionMechanisms'].length-1; i>=0; i--) {
+		cfg['depositionMechanisms'][i].activeFormulaId = null;
+		collection = eval("document.layer"+layerId+".dm"+i);
+		// if(collection instanceof NodeList) {
+		if (collection.length>0 && typeof(collection[0].checked)=='boolean') {
+			for(j=collection.length-1; j>=0; j--) {
+				if(collection[j].checked) {
+					cfg['depositionMechanisms'][i].activeFormulaId = parseInt(collection[j].value);
+				}
+			}
+		} else if(collection instanceof HTMLInputElement) {
+			cfg['depositionMechanisms'][i].activeFormulaId = parseInt(collection.value);
+		}
+		if(cfg['depositionMechanisms'][i].activeFormulaId==null) {
+			alert("You have forgotten to select one or more deposition mechanisms to use.");
+			break;
+		}
+	}
+	
+	// Load Pressure Drop Equation
+	cfg['pressure'].activeFormulaId = null;
+	collection = eval("document.layer"+layerId+".dmpressure");
+	// if(collection instanceof NodeList) {
+	if (collection.length>0 && typeof(collection[0].checked)=='boolean') {
+		for(j=collection.length-1; j>=0; j--) {
+			if(collection[j].checked) {
+				cfg['pressure'].activeFormulaId = parseInt(collection[j].value);
+			}
+		}
+	} else if(collection instanceof HTMLInputElement) {
+		cfg['pressure'].activeFormulaId = parseInt(collection.value);
+	}
+	if(cfg['pressure'].activeFormulaId==null)
+		alert("You have not choosen a Pressure Drop equation.");
+	
+	// load
+	setDependantConstants(cfg['constants']);
+	
+	
+	glbl_pressureDrop.push(new function() { this.layerId = null; this.value = null; });
+	glbl_pressureDrop[glbl_pressureDrop.length-1].layerId = layerId;
+	glbl_pressureDrop[glbl_pressureDrop.length-1].value = cfg['pressure'].evaluate(null, cfg['constants']);
+	
+	out = "<strong>Pressure Drop:</strong> " + glbl_pressureDrop[glbl_pressureDrop.length - 1].value.toFixed(3) + "&nbsp;Pa  "+" <br />";
+	
+	// generate table
+	out += "<table id=\"layer_"+layerId+"_resultTable\" class=\"resultTable\">\n";
+	var topThs = "<tr><th>&nbsp;</th>";
+	for(j=cfg['depositionMechanisms'].length-1; j>=0; j--)
+		topThs += "<th>"+cfg['depositionMechanisms'][j].shortName+"</th>";
+	out += topThs + "<th>Eff</th><th>Figure of Merit</th></tr>";
+	
+	var bodyTds = "";
+	for(psize = parseFloat($('minRange').value); psize <= parseFloat($('maxRange').value); psize+=parseFloat($('step').value)) {
+		psize = Math.round(psize*10000) / 10000;
+		bodyTds += "<tr><th>"+psize+"</th>";
+		sum = 0;
+		for(j=cfg['depositionMechanisms'].length-1; j>=0; j--) {
+			v = cfg['depositionMechanisms'][j].evaluate(psize, cfg['constants']);
+			bodyTds += "<td>"+v.toExponential(3)+"</td>";
+			sum += v;
+		}
+		glbl_eff.push( new function(){ this.layerId = null; this.psize = null; this.value = null;});
+		glbl_eff[glbl_eff.length-1].layerId = layerId;
+		glbl_eff[glbl_eff.length-1].psize = psize;
+		glbl_eff[glbl_eff.length-1].value = (100*(1-Math.exp(-4*cfg['constants']['alpha'].value*cfg['constants']['T'].value*0.1* sum /(3.14*cfg['constants']['fs'].value*0.0001))));
+		bodyTds += "<td>"+glbl_eff[glbl_eff.length-1].value.toFixed(3)+"%</td>";
+		glbl_fmerit.push( new function() { this.layerId = null; this.psize = null; this.value = null; });
+		glbl_fmerit[glbl_fmerit.length-1].layerId = layerId;
+		glbl_fmerit[glbl_fmerit.length-1].psize = psize;
+		glbl_fmerit[glbl_fmerit.length-1].value = -1 * (Math.log(1 - 0.01 * glbl_eff[glbl_eff.length-1].value) / cfg['pressure'].evaluate(psize, cfg['constants']));
+		bodyTds += "<td>"+glbl_fmerit[glbl_fmerit.length-1].value.toExponential(3)+"</td>";
+		bodyTds += "</tr>"
+		
+		ErrorManager.logDebug("Added glbl_eff with layerId: " + glbl_eff[glbl_eff.length-1].layerId
+				+", particle size: " + glbl_eff[glbl_eff.length-1].psize
+				+", and value: " +glbl_eff[glbl_eff.length-1].value);
+	}
+	out += bodyTds + "</table>";
+	
+	if(display) {
+		if (glbl_GraphDisplay == 1) {
+			XWindow.close("windowContainer");
+		}
+		$("windowContainer").innerHTML = out;
+		XWindow.create("Result Table--"+cfg['layers'][layerId].title, "windowContainer");
+		XWindow.maximize("windowContainer");
+		glbl_GraphDisplay = 1;
+	}
+}
+
+function loadGraph() {
+	glbl_eff = new Array();
+	glbl_pressureDrop = new Array();
+	glbl_fmerit = new Array();
+	for(i333=cfg['layers'].length-1; i333>=0; i333--) {
+		ErrorManager.logDebug("Processing layer efficiency layer "+i333);
+		loadLayerResultTable(i333, "adlksv", false);
+	}
+		
+	// glbl_eff
+	var SLG = new SimpleLineGraph("Overall Efficiency");
+	SLG.axis.xLabel = "Particle Diameter (micron meters)";
+	SLG.axis.yLabel = "Efficiency (%)";
+	var ds = new SimpleLineGraph.DataSet("Overall Efficiency");
+	for(psize = parseFloat($('minRange').value); psize <= parseFloat($('maxRange').value); psize+=parseFloat($('step').value)) {
+		psize = Math.round(psize*10000) / 10000;
+		val = new Array();
+		val = 1;
+		for(j=glbl_eff.length-1; j>=0; j--) {
+			if(glbl_eff[j].psize == psize) {
+				val *= (1 - 0.01* glbl_eff[j].value);
+				ErrorManager.logDebug("Mutiplying Layer("+glbl_eff[j].layerId+") with particle size("+glbl_eff[j].psize +") and efficiency: " + glbl_eff[j].value + " equaling: " + val);
+			}
+		}
+		val = 1 - val;
+		percent = Math.round(val*10000) / 100;
+		ds.addPoint(psize, percent);
+	}
+	
+	if (glbl_GraphDisplay == 1) {
+		XWindow.close("windowContainer");
+	}
+	$("windowContainer").innerHTML = "";
+	XWindow.create("Overall Efficiency Graph", "windowContainer");
+	XWindow.maximize("windowContainer");
+	ds.color = "#CC0000";
+	ds.size = 2;
+	SLG.addDataSet(ds, true);
+	SLG.draw("windowContainer", 400, 400, 150, 430);
+
+	glbl_GraphDisplay = 1;
+	glbl_eff = new Array();
+	
+}
+
+function loadFOMGraph() {
+	glbl_eff = new Array();
+	glbl_pressureDrop = new Array();
+	glbl_fmerit = new Array();
+	for(i333=cfg['layers'].length-1; i333>=0; i333--) {
+		ErrorManager.logDebug("Processing layer efficiency layer "+i333);
+		loadLayerResultTable(i333, "adlksv", false);
+	}
+	sum = 0;
+	// load global pressure drop
+	for(i222=glbl_pressureDrop.length-1; i222 >= 0; i222--) {
+		sum += glbl_pressureDrop[i222].value;
+	}
+		
+	// glbl_eff
+	var SLG = new SimpleLineGraph("Overall FOM");
+	SLG.precisionFactor = 10000;
+	SLG.axis.xLabel = "Particle Diameter (micron meters)";
+	SLG.axis.yLabel = "FOM (1/Pa)";
+	var ds = new SimpleLineGraph.DataSet("Overall FOM");
+	for(psize = parseFloat($('minRange').value); psize <= parseFloat($('maxRange').value); psize+=parseFloat($('step').value)) {
+		psize = Math.round(psize*10000) / 10000;
+		val = new Array();
+		val = 1;
+		for(j=glbl_eff.length-1; j>=0; j--) {
+			if(glbl_eff[j].psize == psize) {
+				val *= (1 - 0.01* glbl_eff[j].value);
+			}
+		}
+		val = 1 - val;
+		val = -1 * ( Math.log(1 - val) / sum);
+		percent = Math.round(val*10000000) / 10000000;
+		ds.addPoint(psize, percent);
+	}
+	
+	if (glbl_GraphDisplay == 1) {
+		XWindow.close("windowContainer");
+	}
+	$("windowContainer").innerHTML = "";
+	XWindow.create("Overall FOM Graph", "windowContainer");
+	XWindow.maximize("windowContainer");
+	ds.color = "#CC0000";
+	ds.size = 2;
+	SLG.addDataSet(ds, true);
+	SLG.draw("windowContainer", 400, 400, 150, 430);
+
+	glbl_GraphDisplay = 1;
+	glbl_eff = new Array();
+}
+
+function validateLayerInputs(layerId) {
+	if($('minRange').value <= 0) {
+		alert("Minimum Range is not defined properly.");
+		return false;
+	}
+	if($('maxRange').value <= 0) {
+		alert("Maximum Range is not defined properly.");
+		return false;
+	}
+	if($('step').value <= 0) {
+		alert("Step size is not defined properly.");
+		return false;
+	}
+	
+	return true;
+}
+
+function setActiveDmEquation(dmId, eqId) {
+	cfg['depositionMechanisms'][dmId].activeFormulaId = eqId;
+}

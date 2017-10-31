@@ -1,0 +1,945 @@
+<html lang="en">
+<head>
+  <title>Filtration Software</title>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+  {% load static %}
+  <link rel="stylesheet" type="text/css" href="{% static 'personal/styles/template.css'%}" />
+  <link rel="stylesheet" type="text/css" href="{% static 'personal/styles/ui.css'%}" />
+  <link rel="stylesheet" type="text/css" href="{% static 'personal/styles/layoutComponents.css'%}" />
+  
+  <meta charset="utf-8"> 
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  
+  <script type="text/javascript">
+	  
+	var clickedCases = [0, 0, 0, 0];
+	var clickedLayers = [0, 0, 0, 0,0];
+	var message = "";
+	var displayMessage = 0;
+	for (var i = 0; i < 5; i++) {
+		clickedLayers[i] = [0, 0, 0, 0, 0];
+	}
+	
+	//$(document).on('submit', function(event){
+	//    event.preventDefault();
+	//    alert("form submitted!"); 	
+	//});
+	$.ajax({
+	    url: 'http://127.0.0.1:8000/personal/newtab/action/',
+	    type: 'POST', // This is the default though, you don't actually need to always mention it
+	    success: function() {
+	        alert('success');
+	    },
+	    failure: function() { 
+	        alert('fail');
+	    }
+	}); 
+
+  	function duplicateLayers(caseNum,layerNum) {
+		if (clickedLayers[caseNum-1][layerNum-1] == 0) {
+			var original = document.getElementById('layer1_1');
+		    var clone = original.cloneNode(true); // "deep" clone
+			clone.children['solidity_1_1'].id = 'solidity_'+ caseNum + '_' + layerNum;
+			clone.children['solidity_1_1'].setAttribute("name", 'solidity_'+ caseNum + '_' + layerNum);
+			clone.children['fiberDiameter_1_1'].id = 'fiberDiameter_'+ caseNum + '_' + layerNum;
+			clone.children['fiberDiameter_1_1'].setAttribute("name", 'fiberDiameter_'+ caseNum + '_' + layerNum);
+			clone.children['PermSelect_1_1'].id = 'PermSelect_'+ caseNum + '_' + layerNum;
+			clone.children['PermSelect_1_1'].setAttribute("name", 'PermSelect_'+ caseNum + '_' + layerNum);
+			clone.children['fiberPerm_1_1'].id = 'fiberPerm_'+ caseNum + '_' + layerNum;
+			clone.children['fiberPerm_1_1'].setAttribute("name", 'fiberPerm_'+ caseNum + '_' + layerNum); 
+			clone.children['fiberThickness_1_1'].id = 'fiberThickness_'+ caseNum + '_' + layerNum;
+			clone.children['fiberThickness_1_1'].setAttribute("name", 'fiberThickness_'+ caseNum + '_' + layerNum);
+			clone.children['thicknessUnits_1_1'].id = 'thicknessUnits_'+ caseNum + '_' + layerNum;
+			clone.children['thicknessUnits_1_1'].setAttribute("name", 'thicknessUnits_'+ caseNum + '_' + layerNum);
+			clone.children['densitySelect_1_1'].id = 'densitySelect_'+ caseNum + '_' + layerNum;
+			clone.children['densitySelect_1_1'].setAttribute("name", 'densitySelect_'+ caseNum + '_' + layerNum);
+			clone.children['chargeDensity_1_1'].id = 'chargeDensity_'+ caseNum + '_' + layerNum;
+			clone.children['chargeDensity_1_1'].setAttribute("name", 'chargeDensity_'+ caseNum + '_' + layerNum);	
+			document.getElementById('layer' + layerNum + '_' + caseNum).innerHTML = clone.innerHTML;
+			clickedLayers[caseNum-1][layerNum-1] = 1;
+		}
+  	}
+	  
+	function test() {
+		alert(document.getElementById('layer2').innerHTML);
+	}  
+	function initialize() {
+		if ("{{download}}") {
+			document.getElementById('download').click();
+			alert("Document downloaded");
+		}
+		var caseNum;
+		var layerNum;
+		for (caseNum = 2; caseNum < 6; caseNum++){
+			document.getElementById('list'+ caseNum).style.display = 'none';
+			for (layerNum = 1; layerNum < 6; layerNum++) {
+				document.getElementById('layerlist'+ caseNum + "_" + layerNum).style.display = 'none';
+			}
+		}
+		
+		if ("{{case_1}}" || "{{case_2}}" || "{{case_3}}" || "{{case_4}}" || "{{case_5}}") {
+			var cases = ["{{case_1}}", "{{case_2}}", "{{case_3}}", "{{case_4}}", "{{case_5}}"];
+			var caseNames = ["{{caseName_1}}", "{{caseName_2}}", "{{caseName_3}}", "{{caseName_4}}", "{{caseName_5}}"];
+			var layers = [0, 0, 0, 0, 0];
+			var layerNames = [0, 0, 0, 0, 0];
+			var warning = [0, 0, 0, 0, 0];
+			layers[0] = ["{{layer_1_1}}", "{{layer_1_2}}", "{{layer_1_3}}", "{{layer_1_4}}", "{{layer_1_5}}"];
+			layers[1] = ["{{layer_2_1}}", "{{layer_2_2}}", "{{layer_2_3}}", "{{layer_2_4}}", "{{layer_2_5}}"];
+			layers[2] = ["{{layer_3_1}}", "{{layer_3_2}}", "{{layer_3_3}}", "{{layer_3_4}}", "{{layer_3_5}}"];
+			layers[3] = ["{{layer_4_1}}", "{{layer_4_2}}", "{{layer_4_3}}", "{{layer_4_4}}", "{{layer_4_5}}"];
+			layers[4] = ["{{layer_5_1}}", "{{layer_5_2}}", "{{layer_5_3}}", "{{layer_5_4}}", "{{layer_5_5}}"];
+			layerNames[0] = ["{{layerName_1_1}}", "{{layerName_1_2}}", "{{layerName_1_3}}", "{{layerName_1_4}}", "{{layerName_1_5}}"];
+			layerNames[1] = ["{{layerName_2_1}}", "{{layerName_2_2}}", "{{layerName_2_3}}", "{{layerName_2_4}}", "{{layerName_2_5}}"];
+			layerNames[2] = ["{{layerName_3_1}}", "{{layerName_3_2}}", "{{layerName_3_3}}", "{{layerName_3_4}}", "{{layerName_3_5}}"];
+			layerNames[3] = ["{{layerName_4_1}}", "{{layerName_4_2}}", "{{layerName_4_3}}", "{{layerName_4_4}}", "{{layerName_4_5}}"];
+			layerNames[4] = ["{{layerName_5_1}}", "{{layerName_5_2}}", "{{layerName_5_3}}", "{{layerName_5_4}}", "{{layerName_5_5}}"];
+			warning[0] = ["{{warning_1_1}}", "{{warning_1_2}}", "{{warning_1_3}}", "{{warning_1_4}}", "{{warning_1_5}}"];
+			warning[1] = ["{{warning_2_1}}", "{{warning_2_2}}", "{{warning_2_3}}", "{{warning_2_4}}", "{{warning_2_5}}"];
+			warning[2] = ["{{warning_3_1}}", "{{warning_3_2}}", "{{warning_3_3}}", "{{warning_3_4}}", "{{warning_3_5}}"];
+			warning[3] = ["{{warning_4_1}}", "{{warning_4_2}}", "{{warning_4_3}}", "{{warning_4_4}}", "{{warning_4_5}}"];
+			warning[4] = ["{{warning_5_1}}", "{{warning_5_2}}", "{{warning_5_3}}", "{{warning_5_4}}", "{{warning_5_5}}"];
+			var particlePerm = ["{{particlePerm_1}}", "{{particlePerm_2}}", "{{particlePerm_3}}", "{{particlePerm_4}}", "{{particlePerm_4}}"];
+			var chargeInput = ["{{chargeInput_1}}", "{{chargeInput_2}}", "{{chargeInput_3}}", "{{chargeInput_4}}", "chargeInput_5"];
+			var TemperatureConstant = ["{{TemperatureConstant_1}}", "{{TemperatureConstant_2}}", "{{TemperatureConstant_3}}", "{{TemperatureConstant_4}}", "{{TemperatureConstant_5}}"];
+		
+			var tempUnits = ["{{tempUnits_1}}", "{{tempUnits_2}}", "{{tempUnits_3}}", "{{tempUnits_4}}", "{{tempUnits_5}}"];
+			var pressure = ["{{pressure_1}}", "{{pressure_2}}", "{{pressure_3}}", "{{pressure_4}}", "{{pressure_5}}"];
+			var pressureUnits = ["{{pressureUnits_1}}", "{{pressureUnits_2}}", "{{pressureUnits_3}}", "{{pressureUnits_4}}", "{{pressureUnits_5}}"];
+			var velocity = ["{{velocity_1}}", "{{velocity_2}}", "{{velocity_3}}", "{{velocity_4}}", "{{velocity_5}}"];
+			var velocityUnits = ["{{velocityUnits_1}}", "{{velocityUnits_2}}", "{{velocityUnits_3}}", "{{velocityUnits_4}}", "{{velocityUnits_5}}"];
+			var solidity = [0, 0, 0, 0, 0];
+			solidity[0] = ["{{solidity_1_1}}", "{{solidity_1_2}}", "{{solidity_1_3}}", "{{solidity_1_4}}", "{{solidity_1_5}}"];
+			solidity[1] = ["{{solidity_2_1}}", "{{solidity_2_2}}", "{{solidity_2_3}}", "{{solidity_2_4}}", "{{solidity_2_5}}"];
+			solidity[2] = ["{{solidity_3_1}}", "{{solidity_3_2}}", "{{solidity_3_3}}", "{{solidity_3_4}}", "{{solidity_3_5}}"];
+			solidity[3] = ["{{solidity_4_1}}", "{{solidity_4_2}}", "{{solidity_4_3}}", "{{solidity_4_4}}", "{{solidity_4_5}}"];
+			solidity[4] = ["{{solidity_5_1}}", "{{solidity_5_2}}", "{{solidity_5_3}}", "{{solidity_5_4}}", "{{solidity_5_5}}"];
+		
+			var fiberDiameter = [0, 0, 0, 0, 0];
+			fiberDiameter[0] = ["{{fiberDiameter_1_1}}", "{{fiberDiameter_1_2}}", "{{fiberDiameter_1_3}}", "{{fiberDiameter_1_4}}", "{{fiberDiameter_1_5}}"];
+			fiberDiameter[1] = ["{{fiberDiameter_2_1}}", "{{fiberDiameter_2_2}}", "{{fiberDiameter_2_3}}", "{{fiberDiameter_2_4}}", "{{fiberDiameter_2_5}}"];
+			fiberDiameter[2] = ["{{fiberDiameter_3_1}}", "{{fiberDiameter_3_2}}", "{{fiberDiameter_3_3}}", "{{fiberDiameter_3_4}}", "{{fiberDiameter_3_5}}"];
+			fiberDiameter[3] = ["{{fiberDiameter_4_1}}", "{{fiberDiameter_4_2}}", "{{fiberDiameter_4_3}}", "{{fiberDiameter_4_4}}", "{{fiberDiameter_4_5}}"];
+			fiberDiameter[4] = ["{{fiberDiameter_5_1}}", "{{fiberDiameter_5_2}}", "{{fiberDiameter_5_3}}", "{{fiberDiameter_5_4}}", "{{fiberDiameter_5_5}}"];
+		
+			var fiberPerm = [0, 0, 0, 0, 0];
+			fiberPerm[0] = ["{{fiberPerm_1_1}}", "{{fiberPerm_1_2}}", "{{fiberPerm_1_3}}", "{{fiberPerm_1_4}}", "{{fiberPerm_1_5}}"];
+			fiberPerm[1] = ["{{fiberPerm_2_1}}", "{{fiberPerm_2_2}}", "{{fiberPerm_2_3}}", "{{fiberPerm_2_4}}", "{{fiberPerm_2_5}}"];
+			fiberPerm[2] = ["{{fiberPerm_3_1}}", "{{fiberPerm_3_2}}", "{{fiberPerm_3_3}}", "{{fiberPerm_3_4}}", "{{fiberPerm_3_5}}"];
+			fiberPerm[3] = ["{{fiberPerm_4_1}}", "{{fiberPerm_4_2}}", "{{fiberPerm_4_3}}", "{{fiberPerm_4_4}}", "{{fiberPerm_4_5}}"];
+			fiberPerm[4] = ["{{fiberPerm_5_1}}", "{{fiberPerm_5_2}}", "{{fiberPerm_5_3}}", "{{fiberPerm_5_4}}", "{{fiberPerm_5_5}}"];
+		
+			var fiberThickness = [0, 0, 0, 0, 0];
+			fiberThickness[0] = ["{{fiberThickness_1_1}}", "{{fiberThickness_1_2}}", "{{fiberThickness_1_3}}", "{{fiberThickness_1_4}}", "{{fiberThickness_1_5}}"];
+			fiberThickness[1] = ["{{fiberThickness_2_1}}", "{{fiberThickness_2_2}}", "{{fiberThickness_2_3}}", "{{fiberThickness_2_4}}", "{{fiberThickness_2_5}}"];
+			fiberThickness[2] = ["{{fiberThickness_3_1}}", "{{fiberThickness_3_2}}", "{{fiberThickness_3_3}}", "{{fiberThickness_3_4}}", "{{fiberThickness_3_5}}"];
+			fiberThickness[3] = ["{{fiberThickness_4_1}}", "{{fiberThickness_4_2}}", "{{fiberThickness_4_3}}", "{{fiberThickness_4_4}}", "{{fiberThickness_4_5}}"];
+			fiberThickness[4] = ["{{fiberThickness_5_1}}", "{{fiberThickness_5_2}}", "{{fiberThickness_5_3}}", "{{fiberThickness_5_4}}", "{{fiberThickness_5_5}}"];
+		
+			var thicknessUnits = [0, 0, 0, 0, 0];
+			thicknessUnits[0] = ["{{thicknessUnits_1_1}}", "{{thicknessUnits_1_2}}", "{{thicknessUnits_1_3}}", "{{thicknessUnits_1_4}}", "{{thicknessUnits_1_5}}"];
+			thicknessUnits[1] = ["{{thicknessUnits_2_1}}", "{{thicknessUnits_2_2}}", "{{thicknessUnits_2_3}}", "{{thicknessUnits_2_4}}", "{{thicknessUnits_2_5}}"];
+			thicknessUnits[2] = ["{{thicknessUnits_3_1}}", "{{thicknessUnits_3_2}}", "{{thicknessUnits_3_3}}", "{{thicknessUnits_3_4}}", "{{thicknessUnits_3_5}}"];
+			thicknessUnits[3] = ["{{thicknessUnits_4_1}}", "{{thicknessUnits_4_2}}", "{{thicknessUnits_4_3}}", "{{thicknessUnits_4_4}}", "{{thicknessUnits_4_5}}"];
+			thicknessUnits[4] = ["{{thicknessUnits_5_1}}", "{{thicknessUnits_5_2}}", "{{thicknessUnits_5_3}}", "{{thicknessUnits_5_4}}", "{{thicknessUnits_5_5}}"];
+		
+			var chargeDensity = [0, 0, 0, 0, 0];
+			chargeDensity[0] = ["{{chargeDensity_1_1}}", "{{chargeDensity_1_2}}", "{{chargeDensity_1_3}}", "{{chargeDensity_1_4}}", "{{chargeDensity_1_5}}"];
+			chargeDensity[1] = ["{{chargeDensity_2_1}}", "{{chargeDensity_2_2}}", "{{chargeDensity_2_3}}", "{{chargeDensity_2_4}}", "{{chargeDensity_2_5}}"];
+			chargeDensity[2] = ["{{chargeDensity_3_1}}", "{{chargeDensity_3_2}}", "{{chargeDensity_3_3}}", "{{chargeDensity_3_4}}", "{{chargeDensity_3_5}}"];
+			chargeDensity[3] = ["{{chargeDensity_4_1}}", "{{chargeDensity_4_2}}", "{{chargeDensity_4_3}}", "{{chargeDensity_4_4}}", "{{chargeDensity_4_5}}"];
+			chargeDensity[4] = ["{{chargeDensity_5_1}}", "{{chargeDensity_5_2}}", "{{chargeDensity_5_3}}", "{{chargeDensity_5_4}}", "{{chargeDensity_5_5}}"];
+			
+			for (caseNum = 1; caseNum < 6; caseNum++){
+				if (cases[caseNum-1] == 1) {
+					document.getElementById('box' + caseNum).checked = 'true';
+					document.getElementById('list'+ caseNum).style.display = 'initial';
+					changeCase(caseNum, caseNames[caseNum-1]);
+					document.getElementById('boxInput' + caseNum).value = caseNames[caseNum-1];
+					copyCase(caseNum);
+					var i = caseNum;
+					document.getElementById("particlePerm_" + i).value = particlePerm[i-1];
+					document.getElementById("chargeInput_" + i).value = chargeInput[i-1];
+					document.getElementById("TemperatureConstant_" + i).value = TemperatureConstant[i-1];
+					document.getElementById("tempUnits_" + i).value = tempUnits[i-1];
+					document.getElementById("pressure_" + i).value = pressure[i-1];
+					document.getElementById("pressureUnits_" + i).value = pressureUnits[i-1];
+					document.getElementById("velocity_" + i).value = velocity[i-1];
+					document.getElementById("velocityUnits_" + i).value = velocityUnits[i-1];
+				}
+				for (layerNum = 1; layerNum < 6; layerNum++) {
+					if (layers[caseNum-1][layerNum-1] == 1) {
+						document.getElementById('layerbox' + layerNum + "_" + caseNum).checked = 'true';
+						document.getElementById('layerlist'+ layerNum + "_" + caseNum).style.display = 'initial';
+						changeLayer(caseNum, layerNum, layerNames[caseNum-1][layerNum-1]);
+						document.getElementById('layerboxInput' + layerNum + '_' + caseNum).value = layerNames[caseNum-1][layerNum-1];
+						duplicateLayers(caseNum,layerNum);
+						var j = layerNum;
+						document.getElementById("solidity_" + i + "_" + j).value = solidity[i-1][j-1];
+						document.getElementById("fiberDiameter_" + i + "_" + j).value = fiberDiameter[i-1][j-1];
+						document.getElementById("fiberPerm_" + i + "_" + j).value = fiberPerm[i-1][j-1];
+						document.getElementById("fiberThickness_" + i + "_" + j).value = fiberThickness[i-1][j-1];
+						document.getElementById("thicknessUnits_" + i + "_" + j).value = thicknessUnits[i-1][j-1];
+						document.getElementById("chargeDensity_" + i + "_" + j).value = chargeDensity[i-1][j-1];
+					}
+					if (warning[caseNum-1][layerNum-1] != "") {
+						message += warning[caseNum-1][layerNum-1] + "\n";
+						displayMessage = 1;
+					}
+				}
+			}
+			if (displayMessage){
+				alert(message);
+				displayMessage = 0;
+			}
+		}
+	}
+	  
+	function setValue(id, value) {
+		document.getElementById(id).value = value;
+		document.getElementById(id).style.color = "gray";
+		document.getElementById(id).readOnly = true;
+	}
+	  
+	function convertRelativePerm(thisId, type) {
+		var id = thisId.replace('permittivitySelect','particlePerm');
+		if (type == "psl") {
+			setValue(id,2.55);
+		}
+		else if (type == "kcl") {
+			setValue(id,4.86);
+		}
+		else if (type == "nacl") {
+			setValue(id,5.92);
+		}
+		else if (type == "dos") {
+			setValue(id,4.05);
+		}
+		else if (type == "metals") {
+			setValue(id,Infinity);
+		}
+		else if (type == "sio2") {
+			setValue(id,3.76);
+		}
+		else if (type == 'input') {
+			document.getElementById(id).readOnly = false;
+			document.getElementById(id).style.color = "black";
+		}
+	}
+	
+	function convertFiberPerm(thisId, type) {
+		var id = thisId.replace('PermSelect','fiberPerm');
+		if (type == "input") {
+			document.getElementById(id).readOnly = false;
+			document.getElementById(id).style.color = "black";
+			document.getElementById(id).value = perm;
+		}
+		else if (type == "polybutylene_terephthalate") {
+			setValue(id,3.4);
+		}
+		else if (type == "polycarbonate") {
+			setValue(id,3.1);
+		}
+		else if (type == "polychlorotrifluoroethylene") {
+			setValue(id,2.72);
+		}
+		else if (type == "polyethylene") {
+			setValue(id,2.25);
+		}
+		else if (type == "polymethylpentene") {
+			setValue(id,2.4);
+		}
+		else if (type == "polypropylene") {
+			setValue(id,2.28);
+		}
+		else if (type == "polystyrene") {
+			setValue(id,2.55);
+		}
+		else if (type == "polytetrafluoroethylene") {
+			setValue(id,2.1);
+		}	
+	}
+	function convertChargeDensity(thisId, type) {
+		var id = thisId.replace('densitySelect','chargeDensity');
+		if (type == "input") {
+			document.getElementById(id).readOnly = false;
+			document.getElementById(id).style.color = "black";
+		}
+		else if (type =="high") {
+			setValue(id,118);
+		}
+		else if (type == "low") {
+			setValue(id,25);
+		}
+	}
+	
+	function changeCase(caseNum, newCase) {
+		document.getElementById('span'+caseNum).textContent = newCase;
+	}
+	
+	function changeLayer(caseNum, layerNum, newLayer) {
+		document.getElementById('layerspan'+ layerNum + "_" + caseNum).textContent = newLayer;
+	}
+	
+	function chooseCase() {
+		var i;
+		for (i = 1; i < 6; i++) {
+			box = document.getElementById('box' + i);
+			if (box.checked) {
+				document.getElementById('list' + i).style.display='initial';
+			}
+			else {
+				document.getElementById('list' + i).style.display='none';
+			}
+		}
+	}
+	
+	function chooseLayer(caseNum) {
+		var i;
+		for (i = 1; i < 6; i++) {
+			layerbox = document.getElementById('layerbox' + i + "_" + caseNum);
+			if (layerbox.checked){
+				document.getElementById('layerlist'+i + "_" + caseNum).style.display='initial';
+			}
+			else {
+				document.getElementById('layerlist'+i + "_" + caseNum).style.display='none';			
+			}
+		}
+	}
+	
+	function neutralize(thisId,option) {
+		var id = thisId.replace('particleCharge','chargeInput');
+		if (option == 'neutralized') {
+			setValue(id,'neutralized');
+		}
+		else if (option == 'input') {
+			document.getElementById(id).value = "";
+			document.getElementById(id).style.color = "black";
+			document.getElementById(id).readOnly = false;
+		}
+	}
+	
+	function error() {
+		var diameter1 = document.getElementById("particleDiameter1_1").value;
+		var diameter2 = document.getElementById("particleDiameter2_1").value;
+		var count = 2;
+		if (isNaN(diameter1) || isNaN(diameter2)) {
+			alert('Invalid Particle Diameter');
+			return true;
+		}
+	
+		return false;
+	}
+	function copyCase(caseNum) {
+        //diameter1 = document.getElementById("particleDiameter1_1").value;
+  	    //diameter2 = document.getElementById("particleDiameter2_1").value;
+		var e = document.getElementById("permittivitySelect_1");
+		permittivitySelect = e.options[e.selectedIndex].value;
+  	    particlePerm = document.getElementById("particlePerm_1").value;
+  	    particleCharge = document.getElementById("particleCharge_1").value;
+		
+  	    chargeInput = document.getElementById("chargeInput_1").value;
+  	    TemperatureConstant = document.getElementById("TemperatureConstant_1").value;
+  	  	tempUnits = document.getElementById("tempUnits_1").value;
+  	  	pressure = document.getElementById("pressure_1").value;
+  	  	pressureUnits = document.getElementById("pressureUnits_1").value;
+  	  	humidity = document.getElementById("humidity_1").value;
+  	  	velocity = document.getElementById("velocity_1").value;
+  	  	velocityUnits = document.getElementById("velocityUnits_1").value;
+		var i = caseNum;
+		if (clickedCases[caseNum-2] == 0) {
+			var original = document.getElementById('caseContent1');
+		    var clone = original.cloneNode(true); // "deep" clone
+			//clone.children['particleDiameter1_1'].id = 'particleDiameter1_'+ caseNum;
+			//clone.children['particleDiameter1_1'].setAttribute("name", 'particleDiameter1_'+ caseNum);
+			//clone.children['particleDiameter2_1'].id = 'particleDiameter2_'+ caseNum;
+			//clone.children['particleDiameter2_1'].setAttribute("name", 'particleDiameter2_'+ caseNum);
+			clone.children['permittivitySelect_1'].id = 'permittivitySelect_'+ caseNum;
+			clone.children['permittivitySelect_1'].setAttribute("name", 'permittivitySelect_'+ caseNum);
+			clone.children['particlePerm_1'].id = 'particlePerm_'+ caseNum;
+			clone.children['particlePerm_1'].setAttribute("name", 'particlePerm_'+ caseNum);
+			clone.children['particleCharge_1'].id = 'particleCharge_'+ caseNum;
+			clone.children['particleCharge_1'].setAttribute("name", 'particleCharge_'+ caseNum);
+			clone.children['chargeInput_1'].id = 'chargeInput_'+ caseNum;
+			clone.children['chargeInput_1'].setAttribute("name", 'chargeInput_'+ caseNum);
+			clone.children['TemperatureConstant_1'].id = 'TemperatureConstant_'+ caseNum;
+			clone.children['TemperatureConstant_1'].setAttribute("name", 'TemperatureConstant_'+ caseNum);
+			clone.children['tempUnits_1'].id = 'tempUnits_'+ caseNum;
+			clone.children['tempUnits_1'].setAttribute("name", 'tempUnits_'+ caseNum);
+			clone.children['pressure_1'].id = 'pressure_'+ caseNum;
+			clone.children['pressure_1'].setAttribute("name", 'pressure_'+ caseNum);
+			clone.children['pressureUnits_1'].id = 'pressureUnits_'+ caseNum;
+			clone.children['pressureUnits_1'].setAttribute("name", 'pressureUnits_'+ caseNum);
+			clone.children['humidity_1'].id = 'humidity_'+ caseNum;
+			clone.children['humidity_1'].setAttribute("name", 'humidity_'+ caseNum);
+			clone.children['velocity_1'].id = 'velocity_'+ caseNum;
+			clone.children['velocity_1'].setAttribute("name", 'velocity_'+ caseNum);
+			clone.children['velocityUnits_1'].id = 'velocityUnits_'+ caseNum;
+			clone.children['velocityUnits_1'].setAttribute("name", 'velocityUnits_'+ caseNum);
+			
+			clone.children['myfile_1'].id = 'myfile_'+ caseNum;
+			clone.children['myfile_1'].setAttribute("name", 'myfile_'+ caseNum);
+			document.getElementById('caseContent' + caseNum).innerHTML = clone.innerHTML;
+			
+			//document.getElementById("particleDiameter1_" + i).value = diameter1;
+			//document.getElementById("particleDiameter2_" + i).value = diameter2;
+			document.getElementById("permittivitySelect_" + i).value = permittivitySelect;
+			document.getElementById("particlePerm_" + i).value = particlePerm;
+			convertRelativePerm("permittivitySelect_" + i, permittivitySelect);
+			document.getElementById("particleCharge_" + i).value = particleCharge;
+			document.getElementById("chargeInput_" + i).value = chargeInput;
+			document.getElementById("TemperatureConstant_" + i).value = TemperatureConstant;
+			document.getElementById("tempUnits_" + i).value = tempUnits;
+			document.getElementById("pressure_" + i).value = pressure;
+			document.getElementById("pressureUnits_" + i).value = pressureUnits;
+			document.getElementById("humidity_" + i).value = humidity;
+			document.getElementById("velocity_" + i).value = velocity;
+			document.getElementById("velocityUnits_" + i).value = velocityUnits;
+			//document.getElementById("solidity" + "_" + i).value = solidity;
+			//document.getElementById("fiberDiameter" + "_" + i).value = fiberDiameter;
+			//document.getElementById("PermSelect" + "_" + i).value = PermSelect;
+			//convertFiberPerm(caseNum, PermSelect);
+			//document.getElementById("fiberThickness" + "_" + i).value = fiberThickness;
+			//document.getElementById("thicknessUnits" + "_" + i).value = thicknessUnits;
+			//document.getElementById("densitySelect" + "_" + i).value = densitySelect;
+			//convertChargeDensity(caseNum, densitySelect);
+			clickedCases[caseNum-2] = 1;
+		}
+		else {
+		}	
+	}
+	
+  </script>
+	  
+  <style type="text/css">
+	  /* Tab Navigation */
+	  .nav-tabs {
+	      margin: 0;
+	      padding: 0;
+	      border: 0;  
+		  color: green;
+		   
+	  }
+	  .nav-tabs > li > a {
+	      background: white;
+	      border-radius: 0;
+	      box-shadow: inset 0 -8px 7px -9px rgba(0,0,0,.4),-2px -2px 5px -2px rgba(0,0,0,.4);
+		  border: 1px solid black;
+	  }
+	  .nav-tabs > li.active > a,
+	  .nav-tabs > li.active > a:hover {
+	      background: lightgray;
+	      box-shadow: inset 0 0 0 0 rgba(0,0,0,.4),-2px -3px 5px -2px rgba(0,0,0,.4);
+		  border: 1px solid black;
+	  }
+
+	  /* Tab Content */
+	  .tab-pane {
+	      background: lightgray;
+	      box-shadow: 0 0 4px rgba(0,0,0,.4);
+	      border-radius: 0;
+	      padding: 10px;
+		  border: 1px solid black;
+
+	  }
+	  .button {
+	    display: inline-block;
+	    padding: 10px 2px;
+	    font-size: 14px;
+	    cursor: pointer;
+	    text-align: center;
+	    text-decoration: none;
+	    outline: none;
+	    color: #fff;
+	    background-color: darkgreen;
+	    border: none;
+	    border-radius: 15px;
+	    box-shadow: 0 9px #999;
+	  }
+
+	  .button:hover {
+		background-color: darkred;
+		color: #F2C20D;
+	  }
+
+	  .button:active {
+	    background-color: darkred;
+		color: #F2C20D;
+	    box-shadow: 0 5px #666;
+	    transform: translateY(4px);
+	  }
+	  .help {
+		  background-color: red;
+		  float:right; 
+		  position:relative; 
+		  right:60px; 
+		  bottom:30px;
+	  }
+  </style>
+</head>
+
+
+<body onload="initialize()">
+  <div id="globalContainer" align="center">
+    <center>
+    <div id="container">
+      <div id="headerContainer">
+		  &nbsp;
+	  </div>
+
+	  <div id="navcontainer">
+
+        <div id=logoLink><a href="http://www.me.umn.edu/centers/cfr/index.htm" rel="self"><img id="logo" src="{% static 'personal/images/Logo_trimmed.jpg' %}" height="80" width="144" alt="Center for Filtration Research" /></a>
+		</div>
+		
+		<div id=toolbarLink style="margin-left: 60px"><a href="{% url 'index' %}"  
+            		rel="self"    
+            		>Filter Analysis</a>
+		</div>  
+
+		<div id=toolbarLink><a href="{% url 'dust' %}"  
+            		rel="self">Dust Loading</a>
+		</div>  
+
+		<div id=toolbarLink><a href="{% url 'pleating' %}"  
+            		rel="self">Pleating Design</a>
+	    </div>  
+		<div id=toolbarLink><a href="{% url 'newtab' %}"  
+            		rel="self"
+					id="current"
+					name="current">Electret Filter</a>
+		</div>
+      </div>
+	  <ul class="nav nav-tabs" >
+  		<li id = "list1" class="active"><a data-toggle="tab" href="#case1"><span id = "span1">Case1</span></a></li>
+  	  	<li id = "list2" class =""><a data-toggle="tab" href="#case2" onclick="copyCase(2);duplicateLayers(2,1)"><span id = "span2">Case2</span></a></li>
+        <li id = "list3" class =""><a data-toggle="tab" href="#case3" onclick ="copyCase(3);duplicateLayers(3,1)"><span id = "span3">Case3</span></a></li>
+		<li id = "list4" class =""><a data-toggle="tab" href="#case4" onclick ="copyCase(4);duplicateLayers(4,1)"><span id = "span4">Case4</span></a></li>
+		<li id = "list5" class =""><a data-toggle="tab" href="#case5" onclick ="copyCase(5);duplicateLayers(5,1)"><span id = "span5">Case5</span></a></li>
+  	  	
+	  </ul>
+	  <a href="{% static 'personal/help.pdf' %}" class="help" target = "_blank">Help</a>
+	  <form action = "{% url 'action' %}" method="POST" enctype="multipart/form-data">
+		  {% csrf_token %}
+
+      <div id="splitcontainer" style="width:100%; height: 610px">
+		  <!-- Tab panes -->
+        <div class="tab-content" style="width: 80%; float:left;">
+			
+		  <!CASE 1 IS HERE>
+			
+          <div class="tab-pane active" id="case1" style = "height:610px">
+			<div id="caseContent1">
+  	          <strong>Particle Properties</strong>
+			
+	          <br/>
+	
+	          <!&emsp;Particle diameter:>
+			  <!input type="text" size = "2" value = "3" id = "particleDiameter1_1" name = "particleDiameter1_1">
+			  <!input type="text" size = "2" value = "500" id = "particleDiameter2_1" name = "particleDiameter2_1">
+		
+	          &emsp;Particle relative permittivity:
+	          <select name="permittivitySelect_1" id="permittivitySelect_1" onChange="convertRelativePerm(this.id,this.value)">
+	            <option value="">Select</option>
+	            <option value="input">Input*</option>
+			    <option value="dos">DOS</option>
+			    < option value="metals">Metals</option>
+	            <option value="psl">PSL</option>
+			    <option value="kcl">KCl</option>
+			    <option value="sio2">SiO&#8322;</option>
+			    <option value="nacl">NaCl</option>
+			  </select>
+			  <input type="text" size = "5" value = "" id = "particlePerm_1" name = "particlePerm_1">(-)
+			
+	          <br/>
+	
+	          &emsp;Particle charge (n charges or Boltzmann distribution):
+			  <select name="particleCharge_1" id="particleCharge_1" onChange="neutralize(this.id,this.value)">
+			    <option value="">Select</option>
+			    <option value="input">Input*</option>
+			    <option value="neutralized">Neutralized</option>
+			  </select>
+			  <input type="text" size = "5" value = "" id = "chargeInput_1" name = "chargeInput_1">(-)
+			  <br/>
+			  <br/>
+			  <strong>Operational properties</strong>
+			  <br/>
+			  &emsp;Temperature:<input type="text" size = "5" value = "298.15" id = "TemperatureConstant_1" name = "TemperatureConstant_1" >
+			  <select name="tempUnits_1" id = "tempUnits_1">
+			    <option value="K">K</option>
+			    <option value="C">C</option>
+       	   	    <option value="F">F</option>
+			  </select>
+			  <br/>
+			  &emsp;Upstream pressure:<input type="text" size = "5" value = "1" id = "pressure_1" name = "pressure_1">
+			  <select name="pressureUnits_1" id = "pressureUnits_1">
+			    <option value="atm">atm</option>
+			    <option value="kPa">kPa</option>
+		  	  </select>
+			  <br/>
+			  &emsp;Relative humidity:<input type="text" size = "5" value = "0" id = "humidity_1" name = "humidity_1">%
+			  <br/>
+			  &emsp;Face velocity:<input type="text" size = "5" value = "5" id = "velocity_1" name = "velocity_1">
+			  <select name="velocityUnits_1" id = "velocityUnits_1">
+			    <option value="cm/s">cm/s</option>
+			    <option value="ft/min">ft/min</option>
+		  	  </select>
+			  <br/>
+			  <br/>
+	
+	
+			  <strong>Input experimental data for charge density fitting</strong>
+			  <br/>
+			  &emsp;File import:<br/><input type ="file" name = "myfile_1" id = "myfile_1" style="position:relative;left:10px;">
+			  <br/>
+			  <strong>Filter Properties</strong>
+			</div>
+			<ul class="nav nav-tabs" role="tablist" style="position:relative; left:10px;">
+	  		  <li id="layerlist1_1" class="active"><a href="#layer1_1" role="tab" data-toggle="tab"><span id = "layerspan1_1">Layer1</span></a></li>
+	  		  <li id="layerlist2_1"><a href="#layer2_1" role="tab" data-toggle="tab" onclick="duplicateLayers(1,2)"><span id = "layerspan2_1">Layer2</span></a></li>
+			  <li id="layerlist3_1"><a href="#layer3_1" role="tab" data-toggle="tab" onclick="duplicateLayers(1,3)"><span id = "layerspan3_1">Layer3</span></a></li>
+			  <li id="layerlist4_1"><a href="#layer4_1" role="tab" data-toggle="tab" onclick="duplicateLayers(1,4)"><span id = "layerspan4_1">Layer4</span></a></li>
+			  <li id="layerlist5_1"><a href="#layer5_1" role="tab" data-toggle="tab" onclick="duplicateLayers(1,5)"><span id = "layerspan5_1">Layer5</span></a></li> 
+		    </ul>
+			
+	<!-- Tab panes -->
+	        
+		    <div class="tab-content" style="position:relative; width: 80%;float:left;left:10px">
+		      <div class="tab-pane active" id="layer1_1">
+		  	    &nbsp;Solidity:<input type="text" size = "3" value = "0.102" id = "solidity_1_1" name = "solidity_1_1">(-)
+				
+		  	    <br/>
+		  		&nbsp;Fiber diameter: <input type="text" size = "5" value = "15.6" id = "fiberDiameter_1_1" name = "fiberDiameter_1_1">&#181;m
+		  	    <br/>
+		  		  
+		  	  	&nbsp;Fiber relative permittivity: 
+				<select name="PermSelect_1_1" id = "PermSelect_1_1" onChange="convertFiberPerm(this.id,this.value)">
+				  <option value="">Select</option>
+				  <option value="input">Input*</option>
+		          <option value="polybutylene_terephthalate">Polybutylene terephthalate</option>
+				  <option value="polycarbonate">Polycarbonate</option>
+				  <option value="polychlorotrifluoroethylene">Polychlorotrifluoroethylene</option>
+				  <option value="polyethylene">Polyethylene</option>
+				  <option value="polymethylpentene">Polymethylpentene</option>
+				  <option value="polypropylene">Polypropylene</option>
+				  <option value="polystyrene">Polystyrene</option>
+				  <option value="polytetrafluoroethylene">Polytetrafluoroethylene</option>
+			  	</select>
+				<input type="text" size = "5" value = "" id = "fiberPerm_1_1" name = "fiberPerm_1_1">(-)
+		  	  	<br/>
+		  	  	&nbsp;Layer thickness: <input type="text" size = "5" value = "0.826" id = "fiberThickness_1_1" name = "fiberThickness_1_1">
+				<select name="thicknessUnits_1_1" id = "thicknessUnits_1_1" onChange="">
+				  <option value="mm">mm</option>
+				  <option value="mils">mils</option>
+				</select>
+		  	    <br/>
+		  	  	&nbsp;Charge density: 
+				<select name="densitySelect_1_1" id = "densitySelect_1_1" onChange="convertChargeDensity(this.id,this.value)">
+				  <option value="">Select</option>
+				  <option value="input">Input*</option>
+	        	  <option value="high">High</option>
+				  <option value="low">Low</option>
+		    	</select>
+				<input type="text" size = "5" value = "" id = "chargeDensity_1_1" name = "chargeDensity_1_1">&#181;C/m<sup>2</sup>
+	          </div>
+			  <div class="tab-pane" id="layer2_1">
+				  <p>Layer Content</p>
+			  </div>
+			  <div class="tab-pane" id="layer3_1">
+				  <p>Layer Content</p>
+			  </div>
+			  <div class="tab-pane" id="layer4_1">
+				  <p>Layer Content</p>
+			  </div>
+			  <div class="tab-pane" id="layer5_1">
+				  <p>Layer Content</p>
+			  </div>
+		    </div>
+	  	    <div class="tab-content" style = "width: 20%; float:right;">
+			  <input type="checkbox" id="layerbox1_1" name="layerbox1_1" style="position: relative; left:50px" onchange="chooseLayer(1)" checked>
+	  		  <input type="text" name="layerboxInput1_1" id="layerboxInput1_1" style="position: relative; left: 50px" value="Layer1" size = "5" onchange="changeLayer(1,1,this.value)" onkeydown="if (event.keyCode == 13) {return false;}"><br/>
+			  <input type="checkbox" id="layerbox2_1" name="layerbox2_1" style="position: relative; left:50px" onchange="chooseLayer(1)">
+	  		  <input type="text" name="layerboxInput2_1" id="layerboxInput2_1" style="position: relative; left: 50px" value="Layer2" size = "5" onchange="changeLayer(1,2,this.value)" onkeydown="if (event.keyCode == 13) {return false;}"><br/>
+			  <input type="checkbox" id="layerbox3_1" name="layerbox3_1" style="position: relative; left:50px" onchange="chooseLayer(1)">
+	  		  <input type="text" name="layerboxInput3_1" id="layerboxInput3_1" style="position: relative; left: 50px" value="Layer3" size = "5" onchange="changeLayer(1,3,this.value)" onkeydown="if (event.keyCode == 13) {return false;}"><br/>
+			  <input type="checkbox" id="layerbox4_1" name="layerbox4_1" style="position: relative; left:50px" onchange="chooseLayer(1)">
+	  		  <input type="text" name="layerboxInput4_1" id="layerboxInput4_1" style="position: relative; left: 50px" value="Layer4" size = "5" onchange="changeLayer(1,4,this.value)" onkeydown="if (event.keyCode == 13) {return false;}"><br/>
+			  <input type="checkbox" id="layerbox5_1" name="layerbox5_1" style="position: relative; left:50px" onchange="chooseLayer(1)">
+	  		  <input type="text" name="layerboxInput5_1" id="layerboxInput5_1" style="position: relative; left: 50px" value="Layer5" size = "5" onchange="changeLayer(1,5,this.value)" onkeydown="if (event.keyCode == 13) {return false;}"><br/>
+			</div>
+			<div style = "float:left;">
+			  <br/>
+			  Notes:<textarea type="text" cols="70" rows="1" id = "notes_1" name = "notes_1" style="position:relative;left:20px"></textarea>
+			
+			</div>
+			
+	      </div>
+		  
+	    
+		  
+		  <! CASE 2 IS HERE>
+		   	  
+          <div class="tab-pane" id="case2" style = "height:610px">
+			<div id="caseContent2">
+		      <p>CASE 2 HERE</p>
+			</div>
+			<ul class="nav nav-tabs" role="tablist" style="position:relative; left:10px;">
+	  		  <li id="layerlist1_2" class="active"><a href="#layer1_2" role="tab" data-toggle="tab"><span id = "layerspan1_2">Layer1</span></a></li>
+	  		  <li id="layerlist2_2"><a href="#layer2_2" role="tab" data-toggle="tab" onclick="duplicateLayers(2,2)"><span id = "layerspan2_2">Layer2</span></a></li>
+			  <li id="layerlist3_2"><a href="#layer3_2" role="tab" data-toggle="tab" onclick="duplicateLayers(2,3)"><span id = "layerspan3_2">Layer3</span></a></li>
+			  <li id="layerlist4_2"><a href="#layer4_2" role="tab" data-toggle="tab" onclick="duplicateLayers(2,4)"><span id = "layerspan4_2">Layer4</span></a></li>
+			  <li id="layerlist5_2"><a href="#layer5_2" role="tab" data-toggle="tab" onclick="duplicateLayers(2,5)"><span id = "layerspan5_2">Layer5</span></a></li>
+	  	  	  
+			  
+		    </ul>
+
+	<!-- Tab panes -->
+		    <div class="tab-content" style="position:relative; width: 80%;float:left;left:10px">
+		      <div class="tab-pane active" id="layer1_2">
+		  	    <p>Layer Content</p>
+	          </div>
+			  <div class="tab-pane" id="layer2_2">
+				  <p>Layer Content</p>
+			  </div>
+			  <div class="tab-pane" id="layer3_2">
+				  <p>Layer Content</p>
+			  </div>
+			  <div class="tab-pane" id="layer4_2">
+				  <p>Layer Content</p>
+			  </div>
+			  <div class="tab-pane" id="layer5_2">
+				  <p>Layer Content</p>
+			  </div>
+		    </div>
+	  	    <div style = "width: 20%; float:right;">
+			  <input type="checkbox" id="layerbox1_2" name="layerbox1_2" style="position: relative; left:50px" onchange="chooseLayer(2)" checked>
+	  		  <input type="text" name="layerboxInput1_2" id="layerboxInput1_2" style="position: relative; left: 50px" value="Layer1" size = "5" onchange="changeLayer(2,1,this.value)" onkeydown="if (event.keyCode == 13) {return false;}"><br/>
+			  <input type="checkbox" id="layerbox2_2" name="layerbox2_2" style="position: relative; left:50px" onchange="chooseLayer(2)">
+	  		  <input type="text" name="layerboxInput2_2" id="layerboxInput2_2" style="position: relative; left: 50px" value="Layer2" size = "5" onchange="changeLayer(2,2,this.value)" onkeydown="if (event.keyCode == 13) {return false;}"><br/>
+			  <input type="checkbox" id="layerbox3_2" name="layerbox3_2" style="position: relative; left:50px" onchange="chooseLayer(2)">
+	  		  <input type="text" name="layerboxInput3_2" id="layerboxInput3_2" style="position: relative; left: 50px" value="Layer3" size = "5" onchange="changeLayer(2,3,this.value)" onkeydown="if (event.keyCode == 13) {return false;}"><br/>
+			  <input type="checkbox" id="layerbox4_2" name="layerbox4_2" style="position: relative; left:50px" onchange="chooseLayer(2)">
+	  		  <input type="text" name="layerboxInput4_2" id="layerboxInput4_2" style="position: relative; left: 50px" value="Layer4" size = "5" onchange="changeLayer(2,4,this.value)" onkeydown="if (event.keyCode == 13) {return false;}"><br/>
+			  <input type="checkbox" id="layerbox5_2" name="layerbox5_2" style="position: relative; left:50px" onchange="chooseLayer(2)">
+	  		  <input type="text" name="layerboxInput5_2" id="layerboxInput5_2" style="position: relative; left: 50px" value="Layer5" size = "5" onchange="changeLayer(2,5,this.value)" onkeydown="if (event.keyCode == 13) {return false;}"><br/>
+			</div>
+			<div style = "float:left;">
+			  <br/>
+			  Notes:<textarea type="text" cols="70" rows="1" id = "notes_2" name = "notes_2" style="position:relative;left:20px"></textarea>
+			
+			</div>
+	        
+		  </div>
+		  
+		  <! CASE 3 IS HERE>
+          <div class="tab-pane" id="case3" style = "height:610px">
+			<div id="caseContent3">
+		      <p>CASE 2 HERE</p>
+			</div>
+			<ul class="nav nav-tabs" role="tablist" style="position:relative; left:10px;">
+	  		  <li id="layerlist1_3" class="active"><a href="#layer1_3" role="tab" data-toggle="tab"><span id = "layerspan1_2">Layer1</span></a></li>
+	  		  <li id="layerlist2_3"><a href="#layer2_3" role="tab" data-toggle="tab" onclick="duplicateLayers(3,2)"><span id = "layerspan2_3">Layer2</span></a></li>
+			  <li id="layerlist3_3"><a href="#layer3_3" role="tab" data-toggle="tab" onclick="duplicateLayers(3,3)"><span id = "layerspan3_3">Layer3</span></a></li>
+			  <li id="layerlist4_3"><a href="#layer4_3" role="tab" data-toggle="tab" onclick="duplicateLayers(3,4)"><span id = "layerspan4_3">Layer4</span></a></li>
+			  <li id="layerlist5_3"><a href="#layer5_3" role="tab" data-toggle="tab" onclick="duplicateLayers(3,5)"><span id = "layerspan5_3">Layer5</span></a></li>
+	  	  	  
+			  
+		    </ul>
+
+	<!-- Tab panes -->
+		    <div class="tab-content" style="position:relative; width: 80%;float:left;left:10px">
+		      <div class="tab-pane active" id="layer1_3">
+		  	    <p>Layer Content</p>
+	          </div>
+			  <div class="tab-pane" id="layer2_3">
+				  <p>Layer Content</p>
+			  </div>
+			  <div class="tab-pane" id="layer3_3">
+				  <p>Layer Content</p>
+			  </div>
+			  <div class="tab-pane" id="layer4_3">
+				  <p>Layer Content</p>
+			  </div>
+			  <div class="tab-pane" id="layer5_3">
+				  <p>Layer Content</p>
+			  </div>
+		    </div>
+	  	    <div style = "width: 20%; float:right;">
+			  <input type="checkbox" id="layerbox1_3" name="layerbox1_3" style="position: relative; left:50px" onchange="chooseLayer(3)" checked>
+	  		  <input type="text" name="layerboxInput1_3" id="layerboxInput1_3" style="position: relative; left: 50px" value="Layer1" size = "5" onchange="changeLayer(3,1,this.value)" onkeydown="if (event.keyCode == 13) {return false;}"><br/>
+			  <input type="checkbox" id="layerbox2_3" name="layerbox2_3" style="position: relative; left:50px" onchange="chooseLayer(3)">
+	  		  <input type="text" name="layerboxInput2_3" id="layerboxInput2_3" style="position: relative; left: 50px" value="Layer2" size = "5" onchange="changeLayer(3,2,this.value)" onkeydown="if (event.keyCode == 13) {return false;}"><br/>
+			  <input type="checkbox" id="layerbox3_3" name="layerbox3_3" style="position: relative; left:50px" onchange="chooseLayer(3)">
+	  		  <input type="text" name="layerboxInput3_3" id="layerboxInput3_3" style="position: relative; left: 50px" value="Layer3" size = "5" onchange="changeLayer(3,3,this.value)" onkeydown="if (event.keyCode == 13) {return false;}"><br/>
+			  <input type="checkbox" id="layerbox4_3" name="layerbox4_3" style="position: relative; left:50px" onchange="chooseLayer(3)">
+	  		  <input type="text" name="layerboxInput4_3" id="layerboxInput4_3" style="position: relative; left: 50px" value="Layer4" size = "5" onchange="changeLayer(3,4,this.value)" onkeydown="if (event.keyCode == 13) {return false;}"><br/>
+			  <input type="checkbox" id="layerbox5_3" name="layerbox5_3" style="position: relative; left:50px" onchange="chooseLayer(3)">
+	  		  <input type="text" name="layerboxInput5_3" id="layerboxInput5_3" style="position: relative; left: 50px" value="Layer5" size = "5" onchange="changeLayer(3,5,this.value)" onkeydown="if (event.keyCode == 13) {return false;}"><br/>
+			</div>
+			<div style = "float:left;">
+			  <br/>
+			  Notes:<textarea type="text" cols="70" rows="1" id = "notes_3" name = "notes_3" style="position:relative;left:20px"></textarea>
+			
+			</div>
+		  </div>
+		  
+		   <! CASE 4 IS HERE>
+          <div class="tab-pane" id="case4" style = "height:610px">
+			<div id="caseContent4">
+		      <p>CASE 2 HERE</p>
+			</div>
+			<ul class="nav nav-tabs" role="tablist" style="position:relative; left:10px;">
+	  		  <li id="layerlist1_4" class="active"><a href="#layer1_4" role="tab" data-toggle="tab"><span id = "layerspan1_4">Layer1</span></a></li>
+	  		  <li id="layerlist2_4"><a href="#layer2_4" role="tab" data-toggle="tab" onclick="duplicateLayers(4,2)"><span id = "layerspan2_4">Layer2</span></a></li>
+			  <li id="layerlist3_4"><a href="#layer3_4" role="tab" data-toggle="tab" onclick="duplicateLayers(4,3)"><span id = "layerspan3_4">Layer3</span></a></li>
+			  <li id="layerlist4_4"><a href="#layer4_4" role="tab" data-toggle="tab" onclick="duplicateLayers(4,4)"><span id = "layerspan4_4">Layer4</span></a></li>
+			  <li id="layerlist5_4"><a href="#layer5_4" role="tab" data-toggle="tab" onclick="duplicateLayers(4,5)"><span id = "layerspan5_4">Layer5</span></a></li>
+	  	  	  
+			  
+		    </ul>
+
+	<!-- Tab panes -->
+		    <div class="tab-content" style="position:relative; width: 80%;float:left;left:10px">
+		      <div class="tab-pane active" id="layer1_4">
+		  	    <p>Layer Content</p>
+	          </div>
+			  <div class="tab-pane" id="layer2_4">
+				  <p>Layer Content</p>
+			  </div>
+			  <div class="tab-pane" id="layer3_4">
+				  <p>Layer Content</p>
+			  </div>
+			  <div class="tab-pane" id="layer4_4">
+				  <p>Layer Content</p>
+			  </div>
+			  <div class="tab-pane" id="layer5_4">
+				  <p>Layer Content</p>
+			  </div>
+		    </div>
+	  	    <div style = "width: 20%; float:right;">
+			  <input type="checkbox" id="layerbox1_4" name="layerbox1_4" style="position: relative; left:50px" onchange="chooseLayer(4)" checked>
+	  		  <input type="text" name="layerboxInput1_4" id="layerboxInput1_4" style="position: relative; left: 50px" value="Layer1" size = "5" onchange="changeLayer(4,1,this.value)" onkeydown="if (event.keyCode == 13) {return false;}"><br/>
+			  <input type="checkbox" id="layerbox2_4" name="layerbox2_4" style="position: relative; left:50px" onchange="chooseLayer(4)">
+	  		  <input type="text" name="layerboxInput2_4" id="layerboxInput2_4" style="position: relative; left: 50px" value="Layer2" size = "5" onchange="changeLayer(4,2,this.value)" onkeydown="if (event.keyCode == 13) {return false;}"><br/>
+			  <input type="checkbox" id="layerbox3_4" name="layerbox3_4" style="position: relative; left:50px" onchange="chooseLayer(4)">
+	  		  <input type="text" name="layerboxInput3_4" id="layerboxInput3_4" style="position: relative; left: 50px" value="Layer3" size = "5" onchange="changeLayer(4,3,this.value)" onkeydown="if (event.keyCode == 13) {return false;}"><br/>
+			  <input type="checkbox" id="layerbox4_4" name="layerbox4_4" style="position: relative; left:50px" onchange="chooseLayer(4)">
+	  		  <input type="text" name="layerboxInput4_4" id="layerboxInput4_4" style="position: relative; left: 50px" value="Layer4" size = "5" onchange="changeLayer(4,4,this.value)" onkeydown="if (event.keyCode == 13) {return false;}"><br/>
+			  <input type="checkbox" id="layerbox5_4" name="layerbox5_4" style="position: relative; left:50px" onchange="chooseLayer(4)">
+	  		  <input type="text" name="layerboxInput5_4" id="layerboxInput5_4" style="position: relative; left: 50px" value="Layer5" size = "5" onchange="changeLayer(4,5,this.value)" onkeydown="if (event.keyCode == 13) {return false;}"><br/>
+			</div>
+			<div style = "float:left;">
+			  <br/>
+			  Notes:<textarea type="text" cols="70" rows="1" id = "notes_2" name = "notes_4" style="position:relative;left:20px"></textarea>
+			
+			</div>
+		  </div>
+		  
+		  <! CASE 5 IS HERE>
+          <div class="tab-pane" id="case5" style = "height:610px">
+			<div id="caseContent5">
+		      <p>CASE 2 HERE</p>
+			</div>
+			<ul class="nav nav-tabs" role="tablist" style="position:relative; left:10px;">
+	  		  <li id="layerlist1_5" class="active"><a href="#layer1_5" role="tab" data-toggle="tab"><span id = "layerspan1_5">Layer1</span></a></li>
+	  		  <li id="layerlist2_5"><a href="#layer2_5" role="tab" data-toggle="tab" onclick="duplicateLayers(5,2)"><span id = "layerspan2_5">Layer2</span></a></li>
+			  <li id="layerlist3_5"><a href="#layer3_5" role="tab" data-toggle="tab" onclick="duplicateLayers(5,3)"><span id = "layerspan3_5">Layer3</span></a></li>
+			  <li id="layerlist4_5"><a href="#layer4_5" role="tab" data-toggle="tab" onclick="duplicateLayers(5,4)"><span id = "layerspan4_5">Layer4</span></a></li>
+			  <li id="layerlist5_5"><a href="#layer5_5" role="tab" data-toggle="tab" onclick="duplicateLayers(5,5)"><span id = "layerspan5_5">Layer5</span></a></li>
+	  	  	  
+			  
+		    </ul>
+
+	<!-- Tab panes -->
+		    <div class="tab-content" style="position:relative; width: 80%;float:left;left:10px">
+		      <div class="tab-pane active" id="layer1_5">
+		  	    <p>Layer Content</p>
+	          </div>
+			  <div class="tab-pane" id="layer2_5">
+				  <p>Layer Content</p>
+			  </div>
+			  <div class="tab-pane" id="layer3_5">
+				  <p>Layer Content</p>
+			  </div>
+			  <div class="tab-pane" id="layer4_5">
+				  <p>Layer Content</p>
+			  </div>
+			  <div class="tab-pane" id="layer5_5">
+				  <p>Layer Content</p>
+			  </div>
+		    </div>
+	  	    <div style = "width: 20%; float:right;">
+			  <input type="checkbox" id="layerbox1_5" name="layerbox1_5" style="position: relative; left:50px" onchange="chooseLayer(5)" checked>
+	  		  <input type="text" name="layerboxInput1_5" id="layerboxInput1_5" style="position: relative; left: 50px" value="Layer1" size = "5" onchange="changeLayer(5,1,this.value)" onkeydown="if (event.keyCode == 13) {return false;}"><br/>
+			  <input type="checkbox" id="layerbox2_5" name="layerbox2_5" style="position: relative; left:50px" onchange="chooseLayer(5)">
+	  		  <input type="text" name="layerboxInput2_5" id="layerboxInput2_5" style="position: relative; left: 50px" value="Layer2" size = "5" onchange="changeLayer(5,2,this.value)" onkeydown="if (event.keyCode == 13) {return false;}"><br/>
+			  <input type="checkbox" id="layerbox3_5" name="layerbox3_5" style="position: relative; left:50px" onchange="chooseLayer(5)">
+	  		  <input type="text" name="layerboxInput3_5" id="layerboxInput3_5" style="position: relative; left: 50px" value="Layer3" size = "5" onchange="changeLayer(5,3,this.value)" onkeydown="if (event.keyCode == 13) {return false;}"><br/>
+			  <input type="checkbox" id="layerbox4_5" name="layerbox4_5" style="position: relative; left:50px" onchange="chooseLayer(5)">
+	  		  <input type="text" name="layerboxInput4_5" id="layerboxInput4_5" style="position: relative; left: 50px" value="Layer4" size = "5" onchange="changeLayer(5,4,this.value)" onkeydown="if (event.keyCode == 13) {return false;}"><br/>
+			  <input type="checkbox" id="layerbox5_5" name="layerbox5_5" style="position: relative; left:50px" onchange="chooseLayer(5)">
+	  		  <input type="text" name="layerboxInput5_5" id="layerboxInput5_5" style="position: relative; left: 50px" value="Layer5" size = "5" onchange="changeLayer(5,5,this.value)" onkeydown="if (event.keyCode == 13) {return false;}"><br/>
+			</div>
+			<div style = "float:left;">
+			  <br/>
+			  Notes:<textarea type="text" cols="70" rows="1" id = "notes_2" name = "notes_5" style="position:relative;left:20px"></textarea>
+			
+			</div>
+		  </div>
+	  	</div>
+  	    <div style = "width: 20%; float:right;">
+		  <input type="checkbox" id="box1" name = "box1" style="position: relative; left:40px" onchange="chooseCase()"checked>
+  		  <input type="text" style="position: relative; left: 40px" name="boxInput1" id="boxInput1" value="Case1" size = "5" onchange="changeCase(1,this.value)" onkeydown="if (event.keyCode == 13) {return false;}"><br/>
+		  <input type="checkbox" id="box2" name="box2" style="position: relative; left:40px" onchange="chooseCase()">
+  		  <input type="text" style="position: relative; left: 40px" name="boxInput2" id="boxInput2" value="Case2" size = "5" onchange="changeCase(2,this.value)" onkeydown="if (event.keyCode == 13) {return false;}"><br/>
+		  <input type="checkbox" id="box3" name="box3" style="position: relative; left:40px" onchange="chooseCase()">
+  		  <input type="text" style="position: relative; left: 40px" name="boxInput3" id="boxInput3" value="Case3" size = "5" onchange="changeCase(3,this.value)" onkeydown="if (event.keyCode == 13) {return false;}"><br/>
+		  <input type="checkbox" id="box4" name="box4" style="position: relative; left:40px" onchange="chooseCase()">
+  		  <input type="text" style="position: relative; left: 40px" name="boxInput4" id="boxInput4" value="Case4" size = "5" onchange="changeCase(4,this.value)" onkeydown="if (event.keyCode == 13) {return false;}"><br/>
+		  <input type="checkbox" id="box5" name="box5" style="position: relative; left:40px" onchange="chooseCase()">
+  		  <input type="text" style="position: relative; left: 40px" name="boxInput5" id="boxInput5" value="Case5" size = "5" onchange="changeCase(5,this.value)" onkeydown="if (event.keyCode == 13) {return false;}"><br/>
+		  
+    	  <input type="submit" name = "Penetration" value="Penetration Graph" class="button" style="position: relative; top: 250px; left: 10px;" />
+  		  <br><br>
+    	  <input type="submit" name = "Efficiency" value="Efficiency Graph" class="button" style="position: relative; top: 250px; left: 10px;" onclick="if(error()) {return false;}"/>
+  		  <br><br>
+  		  <input type ="submit" name = "FOM" value = "Figure of Merit Graph" class="button" style="position: relative; top: 250px; left: 10px;"/>
+		  <br><br>
+		  <input type ="submit" name = "Download" value = "Download Report" class="button" style="position: relative; top: 250px; left: 10px;"/>
+  	    </div>
+	  </div>
+	  
+  	  </form>
+	  <a href="{% static 'personal/report.csv' %}" download id="download"></a>
+	  
+      
+  	  {% block content %}
+  	  {% endblock %}
+
+    </div>
+    
+	<br/>
+	<br/>
+
+	</center>
+  </div>
+  <br/>  
+  
+  <div id="footerContainer">
+    <div id="copyright">Copyright &copy; 2012, University of Minnesota</div>
+  	<a href="../Fil_analysis_old/index.html">Previous Version</a>
+  </div>
+  <br />
+  <div id="errorConsole" align="center">
+    <a href="javascript:void(0);" onClick="debugFlag=true; updateDebug();">Start Monitor</a>
+    -
+    <a href="javascript:void(0);" onClick="debugFlag=false;">Stop Monitor</a>
+    - 
+    <a href="javascript:void(0);" onClick="$('errorConsole').innerHTML='';">Clear Monitor</a>
+    -
+    <a href="javascript:void(0);" onClick="ErrorManager.errors=new Array(); $('errorConsole').innerHTML='';">Erase Logs</a>
+  </div>
+  
+</body>
+</html>
